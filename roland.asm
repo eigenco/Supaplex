@@ -1,3 +1,5 @@
+; nasm -fbin roland.asm -o sp_org/roland.snd
+
 	incbin "roland.snd", $, 0x0085-$
 	retn
 
