@@ -1,3 +1,5 @@
+; nasm -fbin blaster.asm -o sp_org/blaster.snd
+
 %macro waitdsp 0
 %%wait:
 	in      al, dx
