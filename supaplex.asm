@@ -1,3 +1,5 @@
+; nasm -fbin supaplex.asm -o supaplex.com
+
 	org     100h
 
 	mov     dx, 0x226              ; reset sound blaster
