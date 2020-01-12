@@ -1,8 +1,11 @@
-; nasm -fbin supaplex.asm -o supaplex.com
-
 	org     100h
 
-	mov     dx, 0x226              ; reset sound blaster
+	mov     al, 0xF3        
+	out     0x60, al
+	mov     al, 0x7F
+	out     0x60, al
+
+	mov     dx, 0x226                              ; reset sound blaster
 	mov     al, 1
 	out     dx, al
 	sub     al, al
@@ -23,7 +26,7 @@ empty:
 nextattempt:
 	loop    empty
 resetok:
-	mov     dx, 0x22c              ; enable sound blaster dac
+	mov     dx, 0x22c                              ; enable sound blaster dac
 wait2:
 	in      al, dx
 	and     al, 0x80
@@ -32,18 +35,18 @@ wait2:
 	out     dx, al
 
 	mov     ax, cs
-	add     ax, 0x58d4             ; initial ss
-	add     ax, (512+0x0100)/16    ; skip org and loader
+	add     ax, 0x58d4                             ; initial ss
+	add     ax, (512+0x0100)/16                    ; skip org and loader
 	mov     ss, ax
-	mov     sp, 0x0080             ; initial sp
+	mov     sp, 0x0080                             ; initial sp
 
 	mov     ax, cs
-	add     ax, 0x0aff             ; initial cs
-	add     ax, (512+0x0100)/16    ; skip org and loader
+	add     ax, 0x0aff                             ; initial cs
+	add     ax, (512+0x0100)/16                    ; skip org and loader
 	push    ax
-	mov     ax, 0x0010             ; initial ip
+	mov     ax, 0x0010                             ; initial ip
 	push    ax
-	retf                           ; jumps to start
+	retf                                           ; jumps to start
 
 	times 512-($-$$) nop
 
@@ -65,6 +68,7 @@ wait2:
 	out dx, al
 	db 0xA0, 0x96, 0x0D
 	out dx, al
+	int 0x70                                       ; 70 Hz sync routine
 	pop ax
 	pop dx
 	ret

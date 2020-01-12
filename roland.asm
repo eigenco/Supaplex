@@ -1,5 +1,3 @@
-; nasm -fbin roland.asm -o sp_org/roland.snd
-
 	incbin "roland.snd", $, 0x0085-$
 	retn
 
@@ -7,6 +5,7 @@
 	mov     dx, 330h
 	mov     al, ah
 	out     dx, al
+
 	retn
 
 	incbin "roland.snd", $, 0x0189-$   ; remove volume (causes clipping)
