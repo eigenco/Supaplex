@@ -1,0 +1,7 @@
+- Some graphics have been made more symmetric in MOVING.DAT
+- Added a resync routine which eliminates jerking due to timing conflict between music routine and screen update
+- Eliminated copy protection code checking
+- Disabled mouse which caused a conflict, menu is now operated with backspace instead of enter
+- Recreated BLASTER.SND for better compatibility
+- Put sound hardware initialization code in separate binary
+
