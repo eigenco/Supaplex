@@ -21453,15 +21453,11 @@ A542f: db 0x16
 A5430: db 0x01
 A5431: db 0x75
 A5432: db 0x03
-A5433: db 0xbb
-A5434: db 0x02
-A5435: db 0x00
-	db 0x80, 0x3e, 0x7b, 0x16, 0x01 ; use menu with backspace
-A543b: db 0x75
-A543c: db 0x03
-A543d: db 0xbb
-A543e: db 0x01
-A543f: db 0x00
+A5433:
+	mov bx, 2
+	cmp byte [0x167b], 1 	; use menu with backspace
+	jnz A5440
+	mov bx, 1
 A5440: db 0xb9
 A5441: db 0x01
 A5442: db 0x00
@@ -22747,7 +22743,7 @@ A594b: db 0xba
 A594c: db 0x54
 A594d: db 0x37
 A594e:
-	mov	cx, 36123 ; size of blaster.snd
+	mov	cx, 36123 ; size of BLASTER.SND
 A5951: db 0xe8
 A5952: db 0x63
 A5953: db 0x00
@@ -22797,7 +22793,7 @@ A597e: db 0xba
 A597f: db 0x54
 A5980: db 0x37
 A5981:
-	mov	cx, 36123 ; size of blaster.snd
+	mov	cx, 36123 ; size of BLASTER.SND
 A5984: db 0xe8
 A5985: db 0x30
 A5986: db 0x00
