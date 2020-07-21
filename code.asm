@@ -1,39 +1,31 @@
-A0000: mov dx, 0x3f60 ; data segment
-A0003: mov ds, dx
-A0005: mov ax, 0xa000
-A0008: mov es, ax
-A000a: call A254f
-A000d: call A5340
-A0010: call A537f
-A0013: call A53a9
-A0016: mov byte [0x630], 1
-A001b: call A1cee
-A001e: call A0395
-A0021: call A03e3
-A0024: call A0282
-A0027: call A5820
-A002a: call A55b9
-A002d: call A5586
-A0030: mov si, 0x605b
-A0033: call A566c
-A0036: db 0xe8
-A0037: db 0x1b
-A0038: db 0x0a
+	mov dx, 0x3f60		; data segment				
+	mov ds, dx
+	mov ax, 0xa000
+	mov es, ax
+	call A254f
+	call A5340 		; set video mode
+	call A537f		; set palette
+	call A53a9
+	mov byte [0x630], 1
+	call A1cee
+	call A0395
+	call A03e3
+	call A0282		; get and set keyboard interrupt
+	call A5820
+	call A55b9		; vga register stuff
+	call A5586		; vga register stuff
+	mov si, 0x605b
+	call A566c
+	call A0a54		; open TITLE.DAT
 A0039: db 0xbe
 A003a: db 0x9b
 A003b: db 0x5e
 A003c: db 0xe8
 A003d: db 0x2d
 A003e: db 0x56
-A003f: db 0xe8
-A0040: db 0x17
-A0041: db 0x08
-A0042: db 0xe8
-A0043: db 0x41
-A0044: db 0x55
-A0045: db 0xe8
-A0046: db 0xdd
-A0047: db 0x06
+	call A0859		; open MOVING.DAT and FIXED.DAT
+	call A5586		; vga register stuff
+	call A0725		; open TITLE1.DAT and TITLE2.DAT
 A0048: db 0xe8
 A0049: db 0xc7
 A004a: db 0x0b
@@ -178,11 +170,8 @@ A00d4: db 0x02
 A00d5: db 0xe8
 A00d6: db 0x76
 A00d7: db 0x57
-A00d8: db 0xb8
-A00d9: db 0x00
-A00da: db 0x4c
-A00db: db 0xcd
-A00dc: db 0x21
+	mov ax, 0x4c00
+	int 0x21 		; return to DOS
 A00dd: db 0x50
 A00de: db 0xe8
 A00df: db 0xc3
@@ -197,10 +186,8 @@ A00e7: db 0x58
 A00e8: db 0xe8
 A00e9: db 0x65
 A00ea: db 0x16
-A00eb: db 0xb4
-A00ec: db 0x4c
-A00ed: db 0xcd
-A00ee: db 0x21
+	mov ah, 0x4c
+	int 0x21 		; return to DOS
 A00ef: db 0xbe
 A00f0: db 0x1b
 A00f1: db 0x5f
@@ -210,9 +197,7 @@ A00f4: db 0x55
 A00f5: db 0xb8
 A00f6: db 0x00
 A00f7: db 0x3d
-A00f8: db 0xba
-A00f9: db 0xed
-A00fa: db 0x36
+	mov dx, 0x36ed		; TITLE2.DAT
 A00fb: db 0xcd
 A00fc: db 0x21
 A00fd: db 0x73
@@ -222,12 +207,9 @@ A0100: db 0xdc
 A0101: db 0xa3
 A0102: db 0x66
 A0103: db 0x07
-A0104: db 0xba
-A0105: db 0xce
-A0106: db 0x03
-A0107: db 0xb0
-A0108: db 0x01
-A0109: db 0xee
+	mov dx, 0x3ce
+	mov al, 1
+	out dx, al
 A010a: db 0x42
 A010b: db 0xb0
 A010c: db 0x00
@@ -609,145 +591,79 @@ A027f: db 0x59
 A0280: db 0x5b
 A0281: ret
 	
-A0282: db 0x1e
-A0283: db 0x06
-A0284: db 0xb4
-A0285: db 0x35
-A0286: db 0xb0
-A0287: db 0x09
-A0288: db 0xcd
-A0289: db 0x21
-A028a: db 0x8c
-A028b: db 0x06
-A028c: db 0xed
-A028d: db 0x16
-A028e: db 0x89
-A028f: db 0x1e
-A0290: db 0xef
-A0291: db 0x16
-A0292: db 0xba
-A0293: db 0xb8
-A0294: db 0x02
-A0295: db 0xb8
-A0296: db 0xc2
-A0297: db 0x36
-A0298: db 0x8e
-A0299: db 0xd8
-A029a: db 0xb4
-A029b: db 0x25
-A029c: db 0xb0
-A029d: db 0x09
-A029e: db 0xcd
-A029f: db 0x21
-A02a0: db 0x07
-A02a1: db 0x1f
-A02a2: ret
+	;;  get and set keyboard interrupt
+A0282:
+	push ds
+	push es
+	mov ah, 0x35
+	mov al, 0x9
+	int 0x21
+	mov [0x16ed], es
+	mov [0x16ef], bx
+	mov dx, 0x2b8	; offset address of keyboard interrupt
+	mov ax, 0x36c2	; segment address of code segment
+	mov ds, ax
+	mov ah, 0x25
+	mov al, 0x9
+	int 0x21
+	pop es
+	pop ds
+	ret
 	
 A02a3: ret
 	
-A02a4: db 0x1e
-A02a5: db 0x06
-A02a6: db 0x8b
-A02a7: db 0x16
-A02a8: db 0xef
-A02a9: db 0x16
-A02aa: db 0xa1
-A02ab: db 0xed
-A02ac: db 0x16
-A02ad: db 0x8e
-A02ae: db 0xd8
-A02af: db 0xb4
-A02b0: db 0x25
-A02b1: db 0xb0
-A02b2: db 0x09
-A02b3: db 0xcd
-A02b4: db 0x21
-A02b5: db 0x07
-A02b6: db 0x1f
-A02b7: ret
+A02a4:
+	push ds
+	push es
+	mov dx,[0x16ef]
+	mov ax,[0x16ed]
+	mov ds,ax
+	mov ah,0x25
+	mov al,0x9
+	int 0x21
+	pop es
+	pop ds
+	ret
 	
-A02b8: db 0x50
-A02b9: db 0x53
-A02ba: db 0x51
-A02bb: db 0x1e
-A02bc: db 0xb8
-A02bd: db 0x60
-A02be: db 0x3f
-A02bf: db 0x8e
-A02c0: db 0xd8
-A02c1: db 0xe4
-A02c2: db 0x60
-A02c3: db 0x8a
-A02c4: db 0xc8
-A02c5: db 0x8a
-A02c6: db 0xd8
-A02c7: db 0xe4
-A02c8: db 0x61
-A02c9: db 0x0c
-A02ca: db 0x80
-A02cb: db 0xe6
-A02cc: db 0x61
-A02cd: db 0x24
-A02ce: db 0x7f
-A02cf: db 0xe6
-A02d0: db 0x61
-A02d1: db 0x32
-A02d2: db 0xc0
-A02d3: db 0x32
-A02d4: db 0xff
-A02d5: db 0xd0
-A02d6: db 0xe3
-A02d7: db 0xf5
-A02d8: db 0xd0
-A02d9: db 0xd0
-A02da: db 0xd0
-A02db: db 0xeb
-A02dc: db 0x88
-A02dd: db 0x87
-A02de: db 0x6d
-A02df: db 0x16
-A02e0: db 0xf6
-A02e1: db 0xc1
-A02e2: db 0x80
-A02e3: db 0x75
-A02e4: db 0x17
-A02e5: db 0x88
-A02e6: db 0x0e
-A02e7: db 0xf9
-A02e8: db 0x16
-A02e9: db 0x80
-A02ea: db 0xf9
-A02eb: db 0x54
-A02ec: db 0x75
-A02ed: db 0x13
-A02ee: db 0xc7
-A02ef: db 0x06
-A02f0: db 0x64
-A02f1: db 0x16
-A02f2: db 0x01
-A02f3: db 0x00
-A02f4: db 0xc7
-A02f5: db 0x06
-A02f6: db 0x6a
-A02f7: db 0x16
-A02f8: db 0x01
-A02f9: db 0x00
-A02fa: db 0xeb
-A02fb: db 0x05
-A02fc: db 0xc6
-A02fd: db 0x06
-A02fe: db 0xf9
-A02ff: db 0x16
-A0300: db 0x00
-A0301: db 0xb0
-A0302: db 0x20
-A0303: db 0xe6
-A0304: db 0x20
-A0305: db 0x1f
-A0306: db 0x59
-A0307: db 0x5b
-A0308: db 0x58
-A0309: iret
+	;; keyboard interrupt handler
+A02b8:
+	push ax
+	push bx
+	push cx
+	push ds
+	mov ax,0x3f60
+	mov ds,ax
+	in al,0x60
+	mov cl,al
+	mov bl,al
+	in al,0x61
+	or al,0x80
+	out 0x61,al
+	and al,0x7f
+	out 0x61,al
+	xor al,al
+	xor bh,bh
+	shl bl,1
+	cmc
+	rcl al,1
+	shr bl,1
+	mov [bx+0x166d],al
+	test cl,0x80
+	jnz A02FC
+	mov [0x16f9],cl
+	cmp cl,0x54
+	jnz A0301
+	mov word [0x1664],0x1
+	mov word [0x166a],0x1
+	jmp short A0301
+A02FC:	mov byte [0x16f9],0x0
+A0301:	mov al,0x20
+	out 0x20,al
+	pop ds
+	pop cx
+	pop bx
+	pop ax
+	iret
 	
 A030a: db 0x1e
 A030b: db 0x52
@@ -1517,9 +1433,7 @@ A05f9: ret
 A05fa: db 0xb8
 A05fb: db 0x00
 A05fc: db 0x3d
-A05fd: db 0xba
-A05fe: db 0x76
-A05ff: db 0x37
+	mov dx, 0x3776 		; PALETTES.DAT
 A0600: db 0xcd
 A0601: db 0x21
 A0602: db 0x73
@@ -2385,9 +2299,7 @@ A095c: ret
 A095d: db 0xb8
 A095e: db 0x00
 A095f: db 0x3d
-A0960: db 0xba
-A0961: db 0xc5
-A0962: db 0x36
+	mov dx, 0x36c5 		; PANEL.DAT
 A0963: db 0xcd
 A0964: db 0x21
 A0965: db 0x73
@@ -2449,9 +2361,7 @@ A099b: ret
 A099c: db 0xb8
 A099d: db 0x00
 A099e: db 0x3d
-A099f: db 0xba
-A09a0: db 0xf8
-A09a1: db 0x36
+	mov dx, 0x36f8 		; BACK.DAT
 A09a2: db 0xcd
 A09a3: db 0x21
 A09a4: db 0x73
@@ -2521,9 +2431,7 @@ A09e2: ret
 A09e3: db 0xb8
 A09e4: db 0x00
 A09e5: db 0x3d
-A09e6: db 0xba
-A09e7: db 0x09
-A09e8: db 0x37
+	mov dx, 0x3709 		; CHARS6.DAT
 A09e9: db 0xcd
 A09ea: db 0x21
 A09eb: db 0x73
@@ -2583,9 +2491,7 @@ A0a20: db 0xf6
 A0a21: db 0xb8
 A0a22: db 0x00
 A0a23: db 0x3d
-A0a24: db 0xba
-A0a25: db 0x14
-A0a26: db 0x37
+	mov dx, 0x3714 		; CHARS8.DAT
 A0a27: db 0xcd
 A0a28: db 0x21
 A0a29: db 0x73
@@ -2815,9 +2721,7 @@ A0b06: ret
 A0b07: db 0xb8
 A0b08: db 0x00
 A0b09: db 0x3d
-A0b0a: db 0xba
-A0b0b: db 0x1f
-A0b0c: db 0x37
+	mov dx, 0x371f 		; LEVEL.LST
 A0b0d: db 0xcd
 A0b0e: db 0x21
 A0b0f: db 0x73
@@ -2879,9 +2783,7 @@ A0b45: ret
 A0b46: db 0xb8
 A0b47: db 0x00
 A0b48: db 0x3d
-A0b49: db 0xba
-A0b4a: db 0x01
-A0b4b: db 0x37
+	mov dx, 0x3701 		; GFX.DAT
 A0b4c: db 0xcd
 A0b4d: db 0x21
 A0b4e: db 0x73
@@ -2951,9 +2853,7 @@ A0b8c: ret
 A0b8d: db 0xb8
 A0b8e: db 0x00
 A0b8f: db 0x3d
-A0b90: db 0xba
-A0b91: db 0x29
-A0b92: db 0x37
+	mov dx, 0x3729 		; CONTROLS.DAT
 A0b93: db 0xcd
 A0b94: db 0x21
 A0b95: db 0x73
@@ -3023,9 +2923,7 @@ A0bd3: ret
 A0bd4: db 0xb8
 A0bd5: db 0x00
 A0bd6: db 0x3d
-A0bd7: db 0xba
-A0bd8: db 0x6b
-A0bd9: db 0x37
+	mov dx, 0x376b 		; PLAYER.LST
 A0bda: db 0xcd
 A0bdb: db 0x21
 A0bdc: db 0x72
@@ -11807,9 +11705,7 @@ A2dff: db 0x00
 A2e00: db 0xb8
 A2e01: db 0x00
 A2e02: db 0x3d
-A2e03: db 0xba
-A2e04: db 0xcf
-A2e05: db 0x36
+	mov dx, 0x36cf 		; MENU.DAT
 A2e06: db 0xcd
 A2e07: db 0x21
 A2e08: db 0x73
@@ -22810,9 +22706,7 @@ A5914: db 0x14
 A5915: db 0xe8
 A5916: db 0x9f
 A5917: db 0x00
-A5918: db 0xba
-A5919: db 0x5f
-A591a: db 0x37
+	mov dx, 0x375f 		; BLASTER.SND
 A591b: db 0xb9
 A591c: db 0x1b
 A591d: db 0x99
@@ -23038,14 +22932,9 @@ A59fa: db 0x1e
 A59fb: db 0x66
 A59fc: db 0x07
 A59fd: db 0x1e
-A59fe: db 0xb8
-A59ff: db 0xb6
-A5a00: db 0x4e
-A5a01: db 0x8e
-A5a02: db 0xd8
-A5a03: db 0xb8
-A5a04: db 0x00
-A5a05: db 0x3f
+	mov ax, 0x4eb6 		; segment address for BLASTER.SND (reloc. c61f)
+	mov ds, ax
+	mov ax, 0x3f00
 A5a06: db 0xba
 A5a07: db 0x00
 A5a08: db 0x00

@@ -47,7 +47,7 @@ skip5:
 skip6:
 	jmp     skip
 start:
-	mov     dx, 0x0a               ; DMA: write  mask register
+	mov     dx, 0x0a               ; DMA: write mask register
 	mov     al, 15                 ; channel 1 disabled
 	out     dx, al
 
@@ -90,7 +90,7 @@ start:
 	mov     al, 1                  ; DMA 1 channel enabled
 	out     dx, al
 
-	mov     dx, 0x22c              ; sound blaster (A220) DSP write data
+	mov     dx, 0x22c              ; sound blaster DSP write data
 wait0:
 	in      al, dx                 ; wait for DSP not needed in DOSBOX
 	or      al, al
