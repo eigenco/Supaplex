@@ -1,3 +1,21 @@
+; port		function
+;
+; 20		Programmable Interrupt Controller (PIC)
+; 40		Programmable Interval Timer (PIT)
+; 60		PS/2 keyboard
+; 3c0		VGA: Attribute Address/Data Register
+; 3c4		VGA: CRTC Controller Address Register
+; 3c8-3c9	VGA: DAC Address Write Mode Register, DAC Data Register
+; 3ce		VGA: Graphics Controller Address Register
+; 3d4		VGA: CRTC Controller Address Register
+;
+; interrupt	function
+;
+; 0x10		VGA: display functions such as mode change and palette
+; 0x1a		RTC: Real Time Clock BIOS services
+; 0x21		DOS: services such as file open, seek, read, write, close
+; 0x80-0x81	sound effects and music
+
 	mov dx, 0x3f60		; data segment				
 	mov ds, dx
 	mov ax, 0xa000
@@ -17,12 +35,8 @@
 	mov si, 0x605b
 	call A566c
 	call A0a54		; open TITLE.DAT
-A0039: db 0xbe
-A003a: db 0x9b
-A003b: db 0x5e
-A003c: db 0xe8
-A003d: db 0x2d
-A003e: db 0x56
+	mov si,0x5e9b
+	call A566c
 	call A0859		; open MOVING.DAT and FIXED.DAT
 	call A5586		; vga register stuff
 	call A0725		; open TITLE1.DAT and TITLE2.DAT
@@ -385,12 +399,10 @@ A01b2: db 0x06
 A01b3: db 0x57
 A01b4: db 0x16
 A01b5: db 0x7a
-A01b6: db 0xba
-A01b7: db 0xd4
-A01b8: db 0x03
-A01b9: db 0xb0
-A01ba: db 0x18
-A01bb: db 0xee
+A01b6:
+	mov dx,0x3d4	; CRTC Controller
+	mov al,0x18	; Line Compare Register
+	out dx,al
 A01bc: db 0x42
 A01bd: db 0x8a
 A01be: db 0xc1
@@ -494,13 +506,11 @@ A021c: db 0x06
 A021d: db 0x57
 A021e: db 0x16
 A021f: db 0x7a
-A0220: db 0xba
-A0221: db 0xd4
-A0222: db 0x03
-A0223: db 0xb0
-A0224: db 0x18
-A0225: db 0xee
-A0226: db 0x42
+A0220:
+	mov dx,0x3d4	; CRTC Controller
+	mov al,0x18	; Line Compare Register
+	out dx,al
+	inc dx
 A0227: db 0x8a
 A0228: db 0xc1
 A0229: db 0xee
@@ -601,7 +611,7 @@ A0281: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
-	;;  get and set keyboard interrupt
+	;;  Get and set keyboard interrupt
 A0282:
 	push ds
 	push es
@@ -641,7 +651,7 @@ A02a4:
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
-	;; keyboard interrupt handler
+	; Keyboard interrupt handler
 A02b8:
 	push ax
 	push bx
@@ -649,7 +659,7 @@ A02b8:
 	push ds
 	mov ax,0x3f60
 	mov ds,ax
-	in al,0x60
+	in al,0x60	; PS/2 keyboard data port
 	mov cl,al
 	mov bl,al
 	in al,0x61
@@ -672,8 +682,10 @@ A02b8:
 	mov word [0x1664],0x1
 	mov word [0x166a],0x1
 	jmp short A0301
-A02FC:	mov byte [0x16f9],0x0
-A0301:	mov al,0x20
+A02FC:
+	mov byte [0x16f9],0x0
+A0301:
+	mov al,0x20
 	out 0x20,al
 	pop ds
 	pop cx
@@ -683,6 +695,7 @@ A0301:	mov al,0x20
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+	; PIT interrupt handler
 A030a:
 	push ds
 	push dx
@@ -727,8 +740,8 @@ A037b:
 	jnz A038d
 	mov byte [0xce78],0x0
 A038d:
-	mov al,0x20
-	out 0x20,al
+	mov al,0x20	; ACK interrupt
+	out 0x20,al	; Programmable Interrupt Controller (PIC) command port
 	pop ax
 	pop dx
 	pop ds
@@ -738,52 +751,32 @@ times 0x0395-($-$$) nop
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A0395: db 0x1e
-A0396: db 0x06
-A0397: db 0xb4
-A0398: db 0x35
-A0399: db 0xb0
-A039a: db 0x08
-A039b: db 0xcd
-A039c: db 0x21
-A039d: db 0x8c
-A039e: db 0x06
-A039f: db 0x8c
-A03a0: db 0x0d
-A03a1: db 0x89
-A03a2: db 0x1e
-A03a3: db 0x8e
-A03a4: db 0x0d
-A03a5: db 0xba
-A03a6: db 0x0a
-A03a7: db 0x03
-A03a8: db 0xb8
-A03a9: db 0xc2
-A03aa: db 0x36
-A03ab: db 0x8e
-A03ac: db 0xd8
-A03ad: db 0xb4
-A03ae: db 0x25
-A03af: db 0xb0
-A03b0: db 0x08
-A03b1: db 0xcd
-A03b2: db 0x21
-A03b3: db 0xb0
-A03b4: db 0x36
-A03b5: db 0xe6
-A03b6: db 0x43
-A03b7: db 0xb0
-A03b8: db 0x38
-A03b9: db 0xe6
-A03ba: db 0x40
-A03bb: db 0xb0
-A03bc: db 0x5d
-A03bd: db 0xe6
-A03be: db 0x40
-A03bf: db 0x07
-A03c0: db 0x1f
-A03c1: ret
+A0395:
+	push ds
+	push es
+	mov ah,0x35	; get interrupt vector
+	mov al,0x8
+	int 0x21
+	mov [0xd8c],es
+	mov [0xd8e],bx
+	mov dx,0x30a
+	mov ax,0x36c2
+	mov ds,ax
+	mov ah,0x25	; set interrupt vector
+	mov al,0x8
+	int 0x21
+	mov al,0x36	; set Programmable Interval Timer (PIT) rate
+	out 0x43,al	; PIT mode/command port
+	mov al,0x38
+	out 0x40,al	; PIT channel 0 data port
+	mov al,0x5d
+	out 0x40,al
+	pop es
+	pop ds
+	ret
 
+times 0x03c2-($-$$) nop
+	
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
 A03c2: ret
@@ -1260,14 +1253,13 @@ A0583: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A0584: db 0xba
-A0585: db 0xf2
-A0586: db 0x03
-A0587: db 0xb0
-A0588: db 0x0f
-A0589: db 0xee
-A058a: ret
+; probably something useless as 3f2 is floppy disk controller port
+;	mov dx,0x3f2
+;	mov al,0xf
+;	out dx,al
+	ret
 
+times 0x058b-($-$$) nop
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
 A058b: db 0x06
@@ -5951,8 +5943,8 @@ A1761: db 0xae
 A1762: db 0x4b
 A1763: db 0x75
 A1764: db 0xf8
-A1765: db 0xb4
-A1766: db 0x0e
+A1765:
+	mov ah,0xe	; VGA putchar
 A1767: db 0x26
 A1768: db 0x8a
 A1769: db 0x05
@@ -5963,28 +5955,24 @@ A176d: db 0x07
 A176e: db 0x47
 A176f: db 0xb7
 A1770: db 0x00
-A1771: db 0xcd
-A1772: db 0x10
-A1773: db 0xeb
-A1774: db 0xf0
-A1775: db 0xb4
-A1776: db 0x0e
-A1777: db 0xb0
-A1778: db 0x0a
-A1779: db 0xb7
-A177a: db 0x00
-A177b: db 0xcd
-A177c: db 0x10
-A177d: db 0xb4
-A177e: db 0x0e
-A177f: db 0xb0
-A1780: db 0x0d
-A1781: db 0xb7
-A1782: db 0x00
-A1783: db 0xcd
-A1784: db 0x10
-A1785: db 0x07
-A1786: db 0xc3
+A1771:
+	int 0x10
+	jmp short A1765
+	mov ah, 0x0e	; VGA putchar
+	mov al, 0x0a
+	mov bh, 0
+	int 0x10
+	mov ah,0xe	; VGA putchar
+	mov al,0xd
+	mov bh,0x0
+	int 0x10
+	pop es
+	ret
+
+times 0x1787-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A1787: db 0x00
 A1788: db 0x00
 A1789: db 0x00
@@ -9482,18 +9470,17 @@ A254e: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A254f: db 0xb8
-A2550: db 0x00
-A2551: db 0x00
-A2552: db 0xcd
-A2553: db 0x1a
-A2554: db 0x33
-A2555: db 0xca
-A2556: db 0x89
-A2557: db 0x0e
-A2558: db 0x2f
-A2559: db 0x6c
-A255a: db 0xc3
+A254f:
+	mov ax,0x0	; Read system clock counter
+	int 0x1a	; System and Real Time Clock BIOS Services
+	xor cx,dx
+	mov [0x6c2f],cx
+	ret
+
+times 0x255b-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A255b: db 0xa1
 A255c: db 0x2f
 A255d: db 0x6c
@@ -21238,6 +21225,9 @@ A5339: db 0xe8
 A533a: db 0x46
 A533b: db 0xff
 A533c: db 0xc3
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A533d: db 0x00
 A533e: db 0x00
 A533f: db 0x00
@@ -21248,11 +21238,9 @@ A5343: db 0x10
 A5344: db 0xa2
 A5345: db 0x10
 A5346: db 0x06
-A5347: db 0xb8
-A5348: db 0x0d
-A5349: db 0x00
-A534a: db 0xcd
-A534b: db 0x10
+A5347:
+	mov ax,0xd	; VGA mode 0x0d, 320x200 at 16 colors
+	int 0x10
 A534c: db 0xbb
 A534d: db 0x00
 A534e: db 0x00
@@ -21303,7 +21291,12 @@ A537a: db 0x06
 A537b: db 0x9a
 A537c: db 0x37
 A537d: db 0x02
-A537e: db 0xc3
+	ret
+
+times 0x537f-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A537f: db 0x80
 A5380: db 0x3e
 A5381: db 0x9a
@@ -21315,17 +21308,16 @@ A5386: db 0xb9
 A5387: db 0x10
 A5388: db 0x00
 A5389: db 0x51
-A538a: db 0xb8
-A538b: db 0x00
-A538c: db 0x10
+A538a:
+	mov ax,0x1000	; set/get palette registers (EGA/VGA)
 A538d: db 0x8a
 A538e: db 0xd9
 A538f: db 0xfe
 A5390: db 0xcb
 A5391: db 0x8a
 A5392: db 0xfb
-A5393: db 0xcd
-A5394: db 0x10
+A5393:
+	int 0x10
 A5395: db 0x59
 A5396: db 0xe2
 A5397: db 0xf1
@@ -21338,15 +21330,21 @@ A539d: db 0xe8
 A539e: db 0xcc
 A539f: db 0x02
 A53a0: db 0xc3
-A53a1: db 0xb4
-A53a2: db 0x00
-A53a3: db 0xa0
-A53a4: db 0x10
-A53a5: db 0x06
-A53a6: db 0xcd
-A53a7: db 0x10
-A53a8: db 0xc3
-A53a9: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A53a1:
+	mov ah,0x0
+	mov al,[0x610]
+	int 0x10
+	ret
+
+times 0x53a9-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A53a9:
+	ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -22389,30 +22387,24 @@ A5801: db 0x47
 A5802: db 0x42
 A5803: db 0xe2
 A5804: db 0xeb
-A5805: db 0x06
-A5806: db 0x8c
-A5807: db 0xd8
-A5808: db 0x8e
-A5809: db 0xc0
-A580a: db 0xb8
-A580b: db 0x02
-A580c: db 0x10
-A580d: db 0xba
-A580e: db 0x11
-A580f: db 0x06
-A5810: db 0xcd
-A5811: db 0x10
-A5812: db 0x07
-A5813: db 0x8b
-A5814: db 0x46
-A5815: db 0xfe
-A5816: db 0xa3
-A5817: db 0x92
-A5818: db 0x0d
-A5819: db 0x8b
-A581a: db 0xe5
-A581b: db 0x5d
-A581c: db 0xc3
+A5805:
+	push es
+	mov ax,ds
+	mov es,ax
+	mov ax,0x1002	; Set/get palette registers (EGA/VGA)
+	mov dx,0x611	; ES:DX = pointer to 17 byte table representing 16 palette registers and border color register
+	int 0x10
+	pop es
+	mov ax,[bp-0x2]
+	mov [0xd92],ax
+	mov sp,bp
+	pop bp
+	ret
+
+times 0x581d-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A581d: db 0x00
 A581e: db 0x00
 A581f: db 0x00
@@ -34645,11 +34637,9 @@ A880f: db 0xfb
 A8810: db 0x00
 A8811: db 0x1f
 A8812: db 0x07
-A8813: db 0xb8
-A8814: db 0x00
-A8815: db 0x00
-A8816: db 0xcd
-A8817: db 0x1a
+A8813:
+	mov ax,0x0	; Read system clock counter
+	int 0x1a	; System and Real Time Clock BIOS Services
 A8818: db 0x33
 A8819: db 0xca
 A881a: db 0x89
