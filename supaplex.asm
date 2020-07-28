@@ -110,7 +110,7 @@ before:
 	resb 224288
 
 code:
-	%include "code.asm"
+	incbin "code.bin"
 
 	times 0x3f690 - ($-$$) db 0
 
