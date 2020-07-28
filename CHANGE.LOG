@@ -3,5 +3,4 @@
 - Eliminated copy protection code checking
 - Disabled mouse which caused a conflict, menu is now operated with backspace instead of enter
 - Recreated BLASTER.SND for better compatibility
-- Put sound hardware initialization code in separate binary
-
+- Converted EXE-file into a COM-file

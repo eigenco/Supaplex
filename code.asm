@@ -22882,7 +22882,7 @@ A59fa: db 0x1e
 A59fb: db 0x66
 A59fc: db 0x07
 A59fd: db 0x1e
-	mov ax, 0x4eb6 		; segment address for BLASTER.SND (reloc. c61f)
+	mov ax, 0x4eb6 		; segment address for BLASTER.SND (reloc. c61f) ... dec2hex(16*hex2dec('3000')+hex2dec('c61f')-224288)
 	mov ds, ax
 	mov ax, 0x3f00
 A5a06: db 0xba

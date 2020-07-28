@@ -1,124 +1,128 @@
-	cpu     8086
+        org     100h
 
-exe_header:
+; ---- initialize roland and sound blaster ----
 
-	db "MZ"
-	dw 64                ; number of bytes in the last 512-byte page
-	dw 711               ; total number of 512-byte pages
-	dw 29                ; number of relocations
-	dw 9                 ; (exe_header + reloc_table in bytes) / 16
-	dw 32                ; minimum memory paragraphs in addition to file size
-	dw 65535             ; maximum paragraphs
-	dw 0x587B            ; initial SS
-	dw 0x0400            ; initial SP
-	dw 0
-	dw 0x0000            ; initial IP
-	dw 224288/16         ; initial CS
-	dw reloc_table       ; relocation table offset
-	dw 0
+        mov     dx, 0x331
+        mov     al, 0x3f
+        out     dx, al  
+        mov     dx, 0x226
+        mov     al, 1
+        out     dx, al
+        sub     al, al
+delay:
+        dec     al
+        jnz     delay
+        out     dx, al
+        sub     cx, cx
+empty:
+        mov     dx, 0x22e
+        in      al, dx
+        or      al, al
+        jns     next
+        sub     dl, 4
+        in      al, dx
+        cmp     al, 0xaa
+        je      reset
+next:
+        loop    empty
+reset:
+        mov     dx, 0x22c
+wt:
+        in      al, dx
+        and     al, 0x80
+        jnz     wt
+        mov     al, 0xd1
+        out     dx, al
 
-reloc_table:
+; ---- move code to intended address ----
 
-	dw 0x6C21
-	dw 0x3000
+        mov     ax, cs
+        mov     ds, ax
+        mov     si, start
+        add     ax, (512+224288)/16
+        mov     es, ax
+        mov     di, 0
+        mov     cx, 35286
+        rep     movsb
 
-	dw 0x6EB6
-	dw 0x3000
+; ---- load data.bin ----
 
-	dw 0x6EDD
-	dw 0x3000
+        mov     ax, cs
+        mov     ds, ax        
 
-	dw 0x6F2E
-	dw 0x3000
+        mov     ax, 0x3d00             ; open file
+        mov     dx, data
+        int     0x21
+        mov     bx, ax                 ; file handle in ax after open
 
-	dw 0x6FC9
-	dw 0x3000
+        mov     ax, cs
+        add     ax, 512/16+0x3f60
+        mov     ds, ax
+        mov     ax, 0x3f00             ; read file
+        mov     cx, 56920              ; number of bytes to read
+        mov     dx, 0
+        int     0x21
 
-	dw 0x7017
-	dw 0x3000
+        mov     ax, 0x3e00             ; close file
+        int     0x21
 
-	dw 0x71AD
-	dw 0x3000
+; ---- perform relocations ----
 
-	dw 0x75DA
-	dw 0x3000
+        mov     bx, cs
+        add     bx, (512+224288)/16
+        mov     ds, bx
 
-	dw 0x7788
-	dw 0x3000
+        mov     ax, cs
+        add     ax, 512/16
+        add     [ds:1], ax
+        add     [ds:662], ax
+        add     [ds:701], ax
+        add     [ds:782], ax
+        add     [ds:937], ax
+        add     [ds:1015], ax
+        add     [ds:1421], ax
+        add     [ds:2490], ax
+        add     [ds:2920], ax
+        add     [ds:2991], ax
+        add     [ds:5972], ax
+        add     [ds:7560], ax
+        add     [ds:11798], ax
+        add     [ds:13274], ax
+        add     [ds:13376], ax
+        add     [ds:18092], ax
+        add     [ds:18203], ax
+        add     [ds:18314], ax
+        add     [ds:18415], ax
+        add     [ds:22571], ax
+        add     [ds:22584], ax
+        add     [ds:22986], ax
+        add     [ds:23039], ax
+        add     [ds:33572], ax
+        add     [ds:33713], ax
+        add     [ds:33778], ax
+        add     [ds:33862], ax
+        add     [ds:33908], ax
+        add     [ds:34064], ax
 
-	dw 0x77CF
-	dw 0x3000
+; ---- prepare stack ----
 
-	dw 0x8374
-	dw 0x3000
+        mov     ax, cs
+        add     ax, 512/16
+        add     ax, 0x587b
+        mov     ss, ax
+        mov     sp, 0x0400
 
-	dw 0x89A8
-	dw 0x3000
+; ---- execute the code ----
 
-	dw 0x9A36
-	dw 0x3000
-
-	dw 0x9FFA
-	dw 0x3000
-
-	dw 0xA060
-	dw 0x3000
-
-	dw 0xB2CC
-	dw 0x3000
-
-	dw 0xB33B
-	dw 0x3000
-
-	dw 0xB3AA
-	dw 0x3000
-
-	dw 0xB40F
-	dw 0x3000
-
-	dw 0xC44B
-	dw 0x3000
-
-	dw 0xC458
-	dw 0x3000
-
-	dw 0xC5EA
-	dw 0x3000
-
-	dw 0xC61F
-	dw 0x3000
-
-	dw 0xEF44
-	dw 0x3000
-
-	dw 0xEFD1
-	dw 0x3000
-
-	dw 0xF012
-	dw 0x3000
-
-	dw 0xF066
-	dw 0x3000
-
-	dw 0xF094
-	dw 0x3000
-
-	dw 0xF130
-	dw 0x3000
-
-before:
-	resb 224288
-
-code:
-	incbin "code.bin"
-
-	times 0x3f690 - ($-$$) db 0
+        mov     ax, cs
+        add     ax, (512+224288)/16
+        push    ax
+        mov     ax, 0
+        push    ax
+        retf
 
 data:
-	incbin "data.bin"
+        db      "data.bin", 0
 
-after:
-	resb 45912
-
-stack:
-	resb 400h
+start:
+        incbin  "code.bin"
