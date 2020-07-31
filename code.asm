@@ -4,7 +4,7 @@
 	mov es,ax
 	call A254f
 	call A5340				; set video mode
-	call A537f				; set palette
+	call set_palette
 	call A53a9
 	mov byte [0x630],0x1
 	call A1cee
@@ -172,9 +172,9 @@ A0164:
 	call A566c
 	ret
 
-times 0x01a2-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x01a2-($-$$) nop
 	
 A01a2:
 	cmp byte [0xdb1],0x0
@@ -230,9 +230,9 @@ A01e4:
 	jl A01b6
 	ret
 
-times 0x020c-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x020c-($-$$) nop
 
 A020c:
 	cmp byte [0xdb1],0x0
@@ -276,9 +276,9 @@ A023a:
 	jl A0220
 	ret
 
-times 0x0262-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0262-($-$$) nop
 	
 A0262:
 	cmp byte [0x379a],0x2
@@ -290,9 +290,9 @@ A026e:
 A0271:
 	ret
 
-times 0x0272-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0272-($-$$) nop
 
 A0272:
 	push bx
@@ -306,9 +306,9 @@ A0277:
 	pop bx
 	ret
 
-times 0x0282-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0282-($-$$) nop
 	
 setup_keyboard_interrupt:
 	push ds
@@ -329,16 +329,16 @@ times 0x295-($-$$) nop
 	pop ds
 	ret
 	
-times 0x02a3-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x02a3-($-$$) nop
 
 A02a3:
 	ret
 
-times 0x02a4-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x02a4-($-$$) nop
 
 restore_keyboard_interrupt:
 	push ds
@@ -353,9 +353,9 @@ restore_keyboard_interrupt:
 	pop ds
 	ret
 
-times 0x02b8-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x02b8-($-$$) nop
 	
 keyboard_interrupt:
 	push ax
@@ -399,9 +399,9 @@ A0301:
 	pop ax
 	iret
 	
-times 0x030a-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x030a-($-$$) nop
 
 PIT_interrupt:
 	push ds
@@ -455,9 +455,9 @@ A038d:
 	pop ds
 	iret
 
-times 0x0395-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0395-($-$$) nop
 
 setup_PIT_interrupt:
 	push ds
@@ -484,16 +484,16 @@ times 0x3a8-($-$$) nop
 	pop ds
 	ret
 
-times 0x03c2-($-$$) nop
-	
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x03c2-($-$$) nop
 	
 A03c2:
 	ret
 
-times 0x03c3-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x03c3-($-$$) nop
 
 restore_PIT_interrupt:
 	push ds
@@ -514,34 +514,34 @@ restore_PIT_interrupt:
 	pop ds
 	ret
 
-times 0x03e3-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x03e3-($-$$) nop
 
 	; install error handler
 A03e3:
-	; relocation #6 would be somewhere around here
+						; relocation #6 would be somewhere around here
 	ret
 
-times 0x0404-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0404-($-$$) nop
 
 	; restore error handler	
 A0404:
 	ret
 
-times 0x0418-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0418-($-$$) nop
 
 A0418:
 	mov al,0x1
 	iret
 
-times 0x041b-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x041b-($-$$) nop
 	
 A041b:
 	mov ax,0x3d00
@@ -628,18 +628,18 @@ A04c8:
 A04d2:
 	ret
 
-times 0x04d3-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x04d3-($-$$) nop
 
 A04d3:
 	call A586a
 	mov byte [0x630],0x0
 	ret
 	
-times 0x04dc-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x04dc-($-$$) nop
 
 A04dc:
 	mov ax,0x3c00
@@ -718,19 +718,19 @@ A0575:
 A0583:
 	ret
 
-times 0x0584-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0584-($-$$) nop
 
 A0584:
 	ret
 
-times 0x058b-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A058b: db 0x06
-A058c:
+times 0x058b-($-$$) nop
+
+A058b:
+	push es
 	mov ax,0x2720				; relocation #7
 A058f: db 0x8e
 A0590: db 0xc0
@@ -837,18 +837,18 @@ A05f4: db 0xa6
 A05f5: db 0x07
 A05f6: ret
 
-times 0x05f7-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x05f7-($-$$) nop
 	
 A05f7:
 	pop cx
 	pop es
 	ret
 
-times 0x05fa-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x05fa-($-$$) nop
 
 A05fa:
 	mov ax,0x3d00
@@ -879,9 +879,9 @@ A0628:
 A0636:
 	ret
 
-times 0x0637-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0637-($-$$) nop
 	
 A0637: db 0x55
 A0638: db 0x8b
@@ -1120,9 +1120,9 @@ A0722: db 0xe5
 A0723: db 0x5d
 A0724: ret
 
-times 0x0725-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0725-($-$$) nop
 
 A0725:
 	mov ax,0x3d00
@@ -1421,9 +1421,9 @@ A0856: db 0x0f
 A0857: db 0xee
 A0858: ret
 
-times 0x0859-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0859-($-$$) nop
 	
 A0859: db 0x55
 A085a: db 0x8b
@@ -1678,9 +1678,9 @@ A095a: db 0xe5
 A095b: db 0x5d
 A095c: ret
 
-times 0x095d-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x095d-($-$$) nop
 
 A095d: db 0xb8
 A095e: db 0x00
@@ -1744,9 +1744,9 @@ A0999: db 0x42
 A099a: db 0xf7
 A099b: ret
 
-times 0x099c-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x099c-($-$$) nop
 	
 A099c: db 0xb8
 A099d: db 0x00
@@ -1817,9 +1817,9 @@ A09e0: db 0xfb
 A09e1: db 0xf6
 A09e2: ret
 
-times 0x09e3-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x09e3-($-$$) nop
 
 A09e3: db 0xb8
 A09e4: db 0x00
@@ -1931,9 +1931,9 @@ A0a51: db 0x8a
 A0a52: db 0xf6
 A0a53: ret
 
-times 0x0a54-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0a54-($-$$) nop
 	
 A0a54: db 0xbb
 A0a55: db 0x84
@@ -2112,9 +2112,9 @@ A0b04: db 0x0f
 A0b05: db 0xee
 A0b06: ret
 
-times 0x0b07-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0b07-($-$$) nop
 	
 A0b07: db 0xb8
 A0b08: db 0x00
@@ -2178,9 +2178,9 @@ A0b43: db 0x98
 A0b44: db 0xf5
 A0b45: ret
 
-times 0x0b46-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0b46-($-$$) nop
 	
 A0b46: db 0xb8
 A0b47: db 0x00
@@ -2251,9 +2251,9 @@ A0b8a: db 0x51
 A0b8b: db 0xf5
 A0b8c: ret
 
-times 0x0b8d-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0b8d-($-$$) nop
 	
 A0b8d: db 0xb8
 A0b8e: db 0x00
@@ -2324,9 +2324,9 @@ A0bd1: db 0x0a
 A0bd2: db 0xf5
 A0bd3: ret
 
-times 0x0bd4-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0bd4-($-$$) nop
 	
 A0bd4: db 0xb8
 A0bd5: db 0x00
@@ -2358,9 +2358,9 @@ A0bf0: db 0xcd
 A0bf1: db 0x21
 A0bf2: ret
 
-times 0x0bf3-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0bf3-($-$$) nop
 	
 A0bf3: db 0xb8
 A0bf4: db 0x00
@@ -2394,9 +2394,9 @@ A0c0f: db 0xcd
 A0c10: db 0x21
 A0c11: ret
 
-times 0x0c12-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0c12-($-$$) nop
 	
 A0c12: db 0xe8
 A0c13: db 0x87
@@ -2433,9 +2433,9 @@ A0c31: db 0x13
 A0c32: db 0xff
 A0c33: ret
 
-times 0x0c34-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0c34-($-$$) nop
 	
 A0c34: db 0x80
 A0c35: db 0x3e
@@ -2517,9 +2517,9 @@ A0c81: db 0x00
 A0c82: db 0x00
 A0c83: ret
 
-times 0x0c84-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0c84-($-$$) nop
 	
 A0c84: db 0xe8
 A0c85: db 0x92
@@ -2637,9 +2637,9 @@ A0cf4: db 0xb5
 A0cf5: db 0x4a
 A0cf6: ret
 
-times 0x0cf7-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0cf7-($-$$) nop
 	
 A0cf7: db 0x00
 A0cf8: db 0x00
@@ -2659,9 +2659,9 @@ A0d05: db 0x74
 A0d06: db 0x01
 A0d07: ret
 
-times 0x0d08-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0d08-($-$$) nop
 	
 A0d08: db 0x8b
 A0d09: db 0x84
@@ -2684,9 +2684,9 @@ A0d19: db 0x75
 A0d1a: db 0x01
 A0d1b: ret
 
-times 0x0d1c-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0d1c-($-$$) nop
 	
 A0d1c: db 0x8b
 A0d1d: db 0x84
@@ -2714,9 +2714,9 @@ A0d32: db 0x74
 A0d33: db 0x01
 A0d34: ret
 
-times 0x0d35-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0d35-($-$$) nop
 	
 A0d35: db 0x83
 A0d36: db 0xbc
@@ -2766,9 +2766,9 @@ A0d61: db 0x74
 A0d62: db 0x1e
 A0d63: ret
 
-times 0x0d64-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0d64-($-$$) nop
 	
 A0d64: db 0xc6
 A0d65: db 0x84
@@ -2823,9 +2823,9 @@ A0d95: db 0x74
 A0d96: db 0x01
 A0d97: ret
 
-times 0x0d98-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0d98-($-$$) nop
 	
 A0d98: db 0xc6
 A0d99: db 0x84
@@ -2879,9 +2879,9 @@ A0dc8: db 0x75
 A0dc9: db 0x01
 A0dca: ret
 
-times 0x0dcb-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0dcb-($-$$) nop
 	
 A0dcb: db 0x3c
 A0dcc: db 0x40
@@ -2913,9 +2913,9 @@ A0de5: db 0x70
 A0de6: db 0x03
 A0de7: ret
 
-times 0x0de8-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0de8-($-$$) nop
 	
 A0de8: db 0x32
 A0de9: db 0xff
@@ -2985,9 +2985,9 @@ A0e28: db 0xc6
 A0e29: db 0x78
 A0e2a: ret
 
-times 0x0e2b-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0e2b-($-$$) nop
 	
 A0e2b: db 0x80
 A0e2c: db 0xfb
@@ -3000,9 +3000,9 @@ A0e32: db 0xbb
 A0e33: db 0x17
 A0e34: ret
 
-times 0x0e35-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0e35-($-$$) nop
 	
 A0e35: db 0xc6
 A0e36: db 0x84
@@ -3018,9 +3018,9 @@ A0e3f: db 0x75
 A0e40: db 0x01
 A0e41: ret
 
-times 0x0e42-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0e42-($-$$) nop
 	
 A0e42: db 0x83
 A0e43: db 0xbc
@@ -3131,9 +3131,9 @@ A0eab: db 0x74
 A0eac: db 0x01
 A0ead: ret
 
-times 0x0eae-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0eae-($-$$) nop
 	
 A0eae: db 0x83
 A0eaf: db 0xbc
@@ -3183,9 +3183,9 @@ A0eda: db 0x74
 A0edb: db 0x24
 A0edc: ret
 
-times 0x0edd-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0edd-($-$$) nop
 	
 A0edd: db 0xc7
 A0ede: db 0x84
@@ -3201,9 +3201,9 @@ A0ee7: db 0x99
 A0ee8: db 0x99
 A0ee9: ret
 
-times 0x0eea-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0eea-($-$$) nop
 	
 A0eea: db 0x83
 A0eeb: db 0xbc
@@ -3228,9 +3228,9 @@ A0efd: db 0x88
 A0efe: db 0x88
 A0eff: ret
 
-times 0x0f00-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0f00-($-$$) nop
 	
 A0f00: db 0x83
 A0f01: db 0xbc
@@ -3241,9 +3241,9 @@ A0f05: db 0x74
 A0f06: db 0x01
 A0f07: ret
 
-times 0x0f08-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0f08-($-$$) nop
 	
 A0f08: db 0xc6
 A0f09: db 0x84
@@ -3258,9 +3258,9 @@ A0f11: db 0x88
 A0f12: db 0x88
 A0f13: ret
 
-times 0x0f14-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0f14-($-$$) nop
 
 A0f14: db 0x8a
 A0f15: db 0x9c
@@ -3360,9 +3360,9 @@ A0f72: db 0xdb
 A0f73: db 0x19
 A0f74: ret
 
-times 0x0f75-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0f75-($-$$) nop
 	
 A0f75: db 0x83
 A0f76: db 0xc6
@@ -3378,15 +3378,15 @@ A0f7f: db 0x23
 A0f80: db 0x06
 A0f81: ret
 
-times 0x0f82-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0f82-($-$$) nop
 	
 A0f82: ret
 
-times 0x0f83-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0f83-($-$$) nop
 	
 A0f83: db 0x80
 A0f84: db 0xe3
@@ -3464,9 +3464,9 @@ A0fcb: db 0xee
 A0fcc: db 0x02
 A0fcd: ret
 
-times 0x0fce-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0fce-($-$$) nop
 	
 A0fce: db 0x80
 A0fcf: db 0xfb
@@ -3479,9 +3479,9 @@ A0fd5: db 0xbb
 A0fd6: db 0x17
 A0fd7: ret
 
-times 0x0fd8-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0fd8-($-$$) nop
 	
 A0fd8: db 0xc7
 A0fd9: db 0x84
@@ -3500,9 +3500,9 @@ A0fe5: db 0x01
 A0fe6: db 0x10
 A0fe7: ret
 
-times 0x0fe8-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x0fe8-($-$$) nop
 	
 A0fe8: db 0x80
 A0fe9: db 0xe3
@@ -3580,9 +3580,9 @@ A1030: db 0xc6
 A1031: db 0x02
 A1032: ret
 
-times 0x1033-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x1033-($-$$) nop
 	
 A1033: db 0x80
 A1034: db 0xfb
@@ -3595,9 +3595,9 @@ A103a: db 0xbb
 A103b: db 0x17
 A103c: ret
 
-times 0x103d-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x103d-($-$$) nop
 	
 A103d: db 0xc7
 A103e: db 0x84
@@ -3616,9 +3616,9 @@ A104a: db 0x01
 A104b: db 0x10
 A104c: ret
 
-times 0x104d-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x104d-($-$$) nop
 	
 A104d: db 0xfe
 A104e: db 0xc3
@@ -3633,9 +3633,9 @@ A1056: db 0xbb
 A1057: db 0x17
 A1058: ret
 
-times 0x1059-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x1059-($-$$) nop
 	
 A1059: db 0x83
 A105a: db 0xbc
@@ -3652,9 +3652,9 @@ A1064: db 0xbb
 A1065: db 0x17
 A1066: ret
 
-times 0x1067-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x1067-($-$$) nop
 	
 A1067: db 0xc7
 A1068: db 0x84
@@ -3677,9 +3677,9 @@ A1078: db 0x17
 A1079: db 0x10
 A107a: ret
 
-times 0x107b-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x107b-($-$$) nop
 	
 A107b: db 0x32
 A107c: db 0xff
@@ -3737,9 +3737,9 @@ A10af: db 0xbb
 A10b0: db 0x17
 A10b1: ret
 
-times 0x10b2-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x10b2-($-$$) nop
 	
 A10b2: db 0x83
 A10b3: db 0xbc
@@ -3790,9 +3790,9 @@ A10df: db 0xff
 A10e0: db 0xff
 A10e1: ret
 
-times 0x10e2-($-$$) nop
-	
 ; ---- ---- ---- ---- ---- ---- ---- ---- fill more RETs down from here
+
+times 0x10e2-($-$$) nop
 
 A10e2: db 0xfe
 A10e3: db 0xcb
@@ -5435,9 +5435,9 @@ A1742: db 0x88
 A1743: db 0x88
 A1744: ret
 
-times 0x1745-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x1745-($-$$) nop
 
 A1745: db 0x00
 A1746: db 0x00
@@ -5500,9 +5500,9 @@ A1771:
 	pop es
 	ret
 
-times 0x1787-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x1787-($-$$) nop
 
 A1787: db 0x00
 A1788: db 0x00
@@ -8604,17 +8604,17 @@ A23a2: db 0xc0
 A23a3: db 0xf9
 A23a4: ret
 
-times 0x23a5-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x23a5-($-$$) nop
 
 	; used to be some gameport stuff
 A23a5:
 	ret
 
-times 0x23ea-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x23ea-($-$$) nop
 
 A23ea: db 0x80
 A23eb: db 0xbc
@@ -8974,9 +8974,9 @@ A254c: db 0x79
 A254d: db 0x1f
 A254e: ret
 
-times 0x254f-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x254f-($-$$) nop
 
 A254f:
 	mov ax,0x0 ; Read system clock counter
@@ -8985,9 +8985,9 @@ A254f:
 	mov [0x6c2f],cx
 	ret
 
-times 0x255b-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x255b-($-$$) nop
 
 A255b: db 0xa1
 A255c: db 0x2f
@@ -20735,61 +20735,49 @@ A537c: db 0x37
 A537d: db 0x02
 	ret
 
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 times 0x537f-($-$$) nop
 
-; ---- ---- ---- ---- ---- ---- ---- ----
-
-A537f: db 0x80
-A5380: db 0x3e
-A5381: db 0x9a
-A5382: db 0x37
-A5383: db 0x01
-A5384: db 0x75
-A5385: db 0x14
-A5386: db 0xb9
-A5387: db 0x10
-A5388: db 0x00
-A5389: db 0x51
-A538a:
-	mov ax,0x1000 ; set/get palette registers (EGA/VGA)
-A538d: db 0x8a
-A538e: db 0xd9
-A538f: db 0xfe
-A5390: db 0xcb
-A5391: db 0x8a
-A5392: db 0xfb
-A5393:
-	int 0x10 ; needed for palette
-A5395: db 0x59
-A5396: db 0xe2
-A5397: db 0xf1
-A5398: db 0xeb
-A5399: db 0x00
-A539a: db 0xbe
-A539b: db 0x5b
-A539c: db 0x60
-A539d: db 0xe8
-A539e: db 0xcc
-A539f: db 0x02
-A53a0: db 0xc3
+set_palette:
+	cmp byte [0x379a],0x1
+	jnz A539a
+	mov cx,0x10
+A5389:
+	push cx
+	mov ax,0x1000				; set/get palette registers (EGA/VGA)
+	mov bl,cl
+	dec bl
+	mov bh,bl
+	int 0x10
+	pop cx
+	loop A5389
+	jmp short A539a
+A539a:
+	mov si,0x605b
+	call A566c
+A53a0:
+	db 0xc3
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x53a1-($-$$) nop
 
 A53a1:
 	mov ax,0x3
 	int 0x10
 	ret
 
-times 0x53a9-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x53a9-($-$$) nop
 
 A53a9:
 	ret
 	
-times 0x53aa-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x53aa-($-$$) nop
 
 resync:
         mov ah,[cs:cnt]
@@ -20809,9 +20797,9 @@ pass:
 cnt:
         db 0
 
-times 0x540f-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x540f-($-$$) nop
 
 A540f: db 0x80
 A5410: db 0x3e
@@ -20824,9 +20812,9 @@ A5416: db 0xeb
 A5417: db 0x00
 A5418: ret
 
-times 0x5419-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x5419-($-$$) nop
 
 A5419: db 0x80
 A541a: db 0x3e
@@ -20856,7 +20844,7 @@ A5431: db 0x75
 A5432: db 0x03
 A5433:
 	mov bx,0x2
-	cmp byte [0x167b],0x1 ; use menu with backspace
+	cmp byte [0x167b],0x1			; use menu with backspace
 	jnz A5440
 	mov bx,0x1
 A5440: db 0xb9
@@ -21013,9 +21001,9 @@ A54d6: db 0x73
 A54d7: db 0xba
 A54d8: ret
 
-times 0x54d9-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x54d9-($-$$) nop
 
 vsync:
 	push dx
@@ -21035,9 +21023,9 @@ A54de:
         pop dx
         ret
 
-times 0x54fe-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x54fe-($-$$) nop
 
 	; vsync for menu etc.
 A54fe:
@@ -21052,9 +21040,9 @@ A5500:
 	pop dx
 	ret
 
-times 0x550b-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x550b-($-$$) nop
 
 A550b: db 0xba
 A550c: db 0xce
@@ -21724,9 +21712,9 @@ A57a8: db 0xe5
 A57a9: db 0x5d
 A57aa: ret
 
-times 0x57ab-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x57ab-($-$$) nop
 
 	; some palette handling stuff
 A57ab: db 0x55
@@ -21835,9 +21823,9 @@ A5805:
 	pop bp
 	ret
 
-times 0x581d-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x581d-($-$$) nop
 
 A581d: db 0x00
 A581e: db 0x00
@@ -21889,18 +21877,18 @@ A584b: db 0xce
 A584c: db 0x00
 A584d: ret
 
-times 0x584e-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x584e-($-$$) nop
 
 A584e:
 	mov byte [0xce72],0x0
 	call A5a21
 	ret
 
-times 0x5857-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x5857-($-$$) nop
 
 A5857: db 0xe8
 A5858: db 0xc7
@@ -23728,9 +23716,9 @@ A5f7e: db 0x24
 A5f7f: db 0x00
 A5f80: ret
 
-times 0x5f81-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x5f81-($-$$) nop
 
 A5f81:
 	push si
@@ -23747,9 +23735,9 @@ A5f81:
 	pop si
 	ret
 
-times 0x5fa8-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x5fa8-($-$$) nop
 
 A5fa8:
 	push si
@@ -23766,9 +23754,9 @@ A5fa8:
 	pop si
 	ret
 
-times 0x5fcf-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x5fcf-($-$$) nop
 
 A5fcf: db 0x80
 A5fd0: db 0x3e
@@ -29657,9 +29645,9 @@ A76ca: db 0x11
 A76cb: db 0x28
 A76cc: ret
 
-times 0x76cd-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ---- fill more RETs up from here
+
+times 0x76cd-($-$$) nop
 
 A76cd: db 0xa1
 A76ce: db 0x4d
@@ -29676,9 +29664,9 @@ A76d8: db 0x74
 A76d9: db 0x45
 A76da: ret
 
-times 0x76db-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x76db-($-$$) nop
 
 A76db: db 0x1e
 A76dc: db 0x56
@@ -29725,9 +29713,9 @@ A7704: db 0xbb
 A7705: db 0x17
 A7706: ret
 
-times 0x7707-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x7707-($-$$) nop
 
 A7707: db 0x80
 A7708: db 0xfc
@@ -29754,9 +29742,9 @@ A771c: db 0x31
 A771d: db 0xb2
 A771e: ret
 
-times 0x771f-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x771f-($-$$) nop
 
 A771f: db 0x8a
 A7720: db 0x9c
@@ -29784,9 +29772,9 @@ A7735: db 0x74
 A7736: db 0x24
 A7737: ret
 
-times 0x7738-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x7738-($-$$) nop
 
 A7738: db 0x83
 A7739: db 0xbc
@@ -29808,9 +29796,9 @@ A7748: db 0x74
 A7749: db 0xbd
 A774a: ret
 
-times 0x774b-($-$$) nop ; add TIMESs down from here
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x774b-($-$$) nop
 
 A774b: db 0xc7
 A774c: db 0x84
@@ -29830,6 +29818,8 @@ A7759: db 0x10
 A775a: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x775b-($-$$) nop
 
 A775b: db 0x83
 A775c: db 0xbc
@@ -29853,6 +29843,8 @@ A776d: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x776e-($-$$) nop
+
 A776e: db 0xc7
 A776f: db 0x84
 A7770: db 0xba
@@ -29871,6 +29863,8 @@ A777c: db 0x18
 A777d: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x777e-($-$$) nop
 
 A777e: db 0x83
 A777f: db 0xbc
@@ -29897,6 +29891,8 @@ A7793: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7794-($-$$) nop
+
 A7794: db 0xc7
 A7795: db 0x84
 A7796: db 0xba
@@ -29915,6 +29911,8 @@ A77a2: db 0x20
 A77a3: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x77a4-($-$$) nop
 
 A77a4: db 0x83
 A77a5: db 0xbc
@@ -29941,6 +29939,8 @@ A77b9: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x77ba-($-$$) nop
+
 A77ba: db 0xc7
 A77bb: db 0x84
 A77bc: db 0xba
@@ -29959,6 +29959,8 @@ A77c8: db 0x28
 A77c9: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x77ca-($-$$) nop
 
 A77ca: db 0x56
 A77cb: db 0x8b
@@ -30036,6 +30038,8 @@ A7812: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7813-($-$$) nop
+
 A7813: db 0xc7
 A7814: db 0x84
 A7815: db 0xba
@@ -30058,6 +30062,8 @@ A7825: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7826-($-$$) nop
+
 A7826: db 0x80
 A7827: db 0xbc
 A7828: db 0xb8
@@ -30073,6 +30079,8 @@ A7831: db 0x01
 A7832: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x7833-($-$$) nop
 
 A7833: db 0x83
 A7834: db 0xbc
@@ -30100,6 +30108,8 @@ A7849: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x784a-($-$$) nop
+
 A784a: db 0x80
 A784b: db 0xbc
 A784c: db 0x42
@@ -30113,6 +30123,8 @@ A7853: db 0xb0
 A7854: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x7855-($-$$) nop
 
 A7855: db 0x83
 A7856: db 0xbc
@@ -30130,6 +30142,8 @@ A7861: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7862-($-$$) nop
+
 A7862: db 0x80
 A7863: db 0xbc
 A7864: db 0xbc
@@ -30146,6 +30160,8 @@ A786e: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x786f-($-$$) nop
+
 A786f: db 0xc6
 A7870: db 0x84
 A7871: db 0xbb
@@ -30154,6 +30170,8 @@ A7873: db 0x01
 A7874: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x7875-($-$$) nop
 
 A7875: db 0x56
 A7876: db 0x8b
@@ -30226,6 +30244,8 @@ A78b8: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x78b9-($-$$) nop
+
 A78b9: db 0xc7
 A78ba: db 0x84
 A78bb: db 0xba
@@ -30248,6 +30268,8 @@ A78cb: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x78cc-($-$$) nop
+
 A78cc: db 0x80
 A78cd: db 0xbc
 A78ce: db 0x32
@@ -30263,6 +30285,8 @@ A78d7: db 0x03
 A78d8: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x78d9-($-$$) nop
 
 A78d9: db 0x83
 A78da: db 0xbc
@@ -30290,6 +30314,8 @@ A78ef: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x78f0-($-$$) nop
+
 A78f0: db 0x80
 A78f1: db 0xbc
 A78f2: db 0xb8
@@ -30303,6 +30329,8 @@ A78f9: db 0xb0
 A78fa: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x78fb-($-$$) nop
 
 A78fb: db 0x83
 A78fc: db 0xbc
@@ -30320,6 +30348,8 @@ A7907: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7908-($-$$) nop
+
 A7908: db 0x80
 A7909: db 0xbc
 A790a: db 0x42
@@ -30336,6 +30366,8 @@ A7914: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7915-($-$$) nop
+
 A7915: db 0xc6
 A7916: db 0x84
 A7917: db 0xbb
@@ -30344,6 +30376,8 @@ A7919: db 0x03
 A791a: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x791b-($-$$) nop
 
 A791b: db 0x56
 A791c: db 0x8b
@@ -30423,6 +30457,8 @@ A7965: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7966-($-$$) nop
+
 A7966: db 0xc7
 A7967: db 0x84
 A7968: db 0xba
@@ -30445,6 +30481,8 @@ A7978: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7979-($-$$) nop
+
 A7979: db 0x80
 A797a: db 0xbc
 A797b: db 0xbc
@@ -30460,6 +30498,8 @@ A7984: db 0x05
 A7985: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x7986-($-$$) nop
 
 A7986: db 0x83
 A7987: db 0xbc
@@ -30487,6 +30527,8 @@ A799c: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x799d-($-$$) nop
+
 A799d: db 0x80
 A799e: db 0xbc
 A799f: db 0x32
@@ -30500,6 +30542,8 @@ A79a6: db 0xaf
 A79a7: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x79a8-($-$$) nop
 
 A79a8: db 0x83
 A79a9: db 0xbc
@@ -30517,6 +30561,8 @@ A79b4: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x79b5-($-$$) nop
+
 A79b5: db 0x80
 A79b6: db 0xbc
 A79b7: db 0xb8
@@ -30533,6 +30579,8 @@ A79c1: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x79c2-($-$$) nop
+
 A79c2: db 0xc6
 A79c3: db 0x84
 A79c4: db 0xbb
@@ -30541,6 +30589,8 @@ A79c6: db 0x05
 A79c7: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x79c8-($-$$) nop
 
 A79c8: db 0x56
 A79c9: db 0x8b
@@ -30614,6 +30664,8 @@ A7a0c: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7a0d-($-$$) nop
+
 A7a0d: db 0xc7
 A7a0e: db 0x84
 A7a0f: db 0xba
@@ -30636,6 +30688,8 @@ A7a1f: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x7a20-($-$$) nop
+
 A7a20: db 0x80
 A7a21: db 0xbc
 A7a22: db 0x42
@@ -30651,6 +30705,8 @@ A7a2b: db 0x07
 A7a2c: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x7a2d-($-$$) nop
 
 A7a2d: db 0x83
 A7a2e: db 0xbc
@@ -33159,6 +33215,8 @@ A8321: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x8322-($-$$) nop
+
 A8322: db 0x06
 A8323: db 0xb8
 A8324: db 0x00
@@ -33286,6 +33344,8 @@ A839d: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x839e-($-$$) nop
+
 A839e: db 0x80
 A839f: db 0x3e
 A83a0: db 0x9a
@@ -33304,6 +33364,8 @@ A83ac: db 0xff
 A83ad: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x83ae-($-$$) nop
 
 A83ae: db 0x1e
 A83af: db 0x06
@@ -33372,6 +33434,8 @@ A83ed: db 0x1f
 A83ee: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x83ef-($-$$) nop
 
 A83ef: db 0x1e
 A83f0: db 0x06
@@ -33461,6 +33525,8 @@ A8443: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x8444-($-$$) nop
+
 A8444: db 0x06
 A8445: db 0xb8
 A8446: db 0x00
@@ -33502,6 +33568,8 @@ A8469: db 0x07
 A846a: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x846b-($-$$) nop
 
 A846b: db 0x80
 A846c: db 0x3e
@@ -33641,139 +33709,86 @@ A84f5: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A84f6: db 0x80
-A84f7: db 0x3e
-A84f8: db 0x9a
-A84f9: db 0x37
-A84fa: db 0x01
-A84fb: db 0x75
-A84fc: db 0x01
-A84fd: ret
+times 0x84f6-($-$$) nop
+
+A84f6:
+	cmp byte [0x379a],0x1
+	jnz A84fe
+	ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A84fe: db 0xbe
-A84ff: db 0x00
-A8500: db 0x00
-A8501: db 0x8a
-A8502: db 0x1e
-A8503: db 0x96
-A8504: db 0x0d
-A8505: db 0x32
-A8506: db 0xff
-A8507: db 0xb8
-A8508: db 0xc0
-A8509: db 0x0f
-A850a: db 0xf7
-A850b: db 0xe3
-A850c: db 0x03
-A850d: db 0xf0
-A850e: db 0x1e
-A850f: db 0xb8
-A8510: db 0x00
-A8511: db 0x00
-A8512: db 0x8e
-A8513: db 0xd8
-A8514: db 0xbf
-A8515: db 0x00
-A8516: db 0x00
-A8517: db 0xba
-A8518: db 0xce
-A8519: db 0x03
-A851a: db 0xb0
-A851b: db 0x05
-A851c: db 0xee
-A851d: db 0x42
-A851e: db 0xb0
-A851f: db 0x00
-A8520: db 0xee
-A8521: db 0xba
-A8522: db 0xce
-A8523: db 0x03
-A8524: db 0xb0
-A8525: db 0x01
-A8526: db 0xee
-A8527: db 0x42
-A8528: db 0xb0
-A8529: db 0x00
-A852a: db 0xee
-A852b: db 0xba
-A852c: db 0xce
-A852d: db 0x03
-A852e: db 0xb0
-A852f: db 0x08
-A8530: db 0xee
-A8531: db 0x42
-A8532: db 0xb0
-A8533: db 0xff
-A8534: db 0xee
-A8535: db 0xb9
-A8536: db 0x18
-A8537: db 0x00
-A8538: db 0x51
-A8539: db 0xb4
-A853a: db 0x01
-A853b: db 0xba
-A853c: db 0xc4
-A853d: db 0x03
-A853e: db 0xb0
-A853f: db 0x02
-A8540: db 0xee
-A8541: db 0x42
-A8542: db 0x8a
-A8543: db 0xc4
-A8544: db 0xee
-A8545:
-	mov cx,21
+times 0x84fe-($-$$) nop
+
+A84fe:
+	mov si,0x0
+	mov bl,[0xd96]
+	xor bh,bh
+	mov ax,0xfc0
+	mul bx
+	add si,ax
+	push ds
+	mov ax,0x0
+	mov ds,ax
+	mov di,0x0
+	mov dx,0x3ce
+	mov al,0x5
+	out dx,al
+	inc dx
+	mov al,0x0
+	out dx,al
+	mov dx,0x3ce
+	mov al,0x1
+	out dx,al
+	inc dx
+	mov al,0x0
+	out dx,al
+	mov dx,0x3ce
+	mov al,0x8
+	out dx,al
+	inc dx
+	mov al,0xff
+	out dx,al
+	mov cx,0x18
+A8538:
+	push cx
+	mov ah,0x1
+A853b:
+	mov dx,0x3c4
+	mov al,0x2
+	out dx,al
+	inc dx
+	mov al,ah
+	out dx,al
+	mov cx,0x15
 	rep movsw
-A854a: db 0x83
-A854b: db 0xef
-A854c: db 0x2a
-A854d: db 0xd0
-A854e: db 0xe4
-A854f: db 0xf6
-A8550: db 0xc4
-A8551: db 0x0f
-A8552: db 0x75
-A8553: db 0xe7
-A8554: db 0x83
-A8555: db 0xc7
-A8556: db 0x7a
-A8557: db 0x59
-A8558: db 0xe2
-A8559: db 0xde
-A855a: db 0xba
-A855b: db 0xc4
-A855c: db 0x03
-A855d: db 0xb0
-A855e: db 0x02
-A855f: db 0xee
-A8560: db 0x42
-A8561: db 0xb0
-A8562: db 0xff
-A8563: db 0xee
-A8564: db 0xba
-A8565: db 0xce
-A8566: db 0x03
-A8567: db 0xb0
-A8568: db 0x01
-A8569: db 0xee
-A856a: db 0x42
-A856b: db 0xb0
-A856c: db 0x0f
-A856d: db 0xee
-A856e: db 0x1f
-A856f: db 0xba
-A8570: db 0xce
-A8571: db 0x03
-A8572: db 0xb0
-A8573: db 0x05
-A8574: db 0xee
-A8575: db 0x42
-A8576: db 0xb0
-A8577: db 0x01
-A8578: db 0xee
-A8579: ret
+	sub di,byte +0x2a
+	shl ah,1
+	test ah,0xf
+	jnz A853b
+	add di,byte +0x7a
+	pop cx
+	loop A8538
+	mov dx,0x3c4
+	mov al,0x2
+	out dx,al
+	inc dx
+	mov al,0xff
+	out dx,al
+	mov dx,0x3ce
+	mov al,0x1
+	out dx,al
+	inc dx
+	mov al,0xf
+	out dx,al
+	pop ds
+	mov dx,0x3ce
+	mov al,0x5
+	out dx,al
+	inc dx
+	mov al,0x1
+	out dx,al
+	ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -33785,6 +33800,8 @@ A857e: db 0x00
 A857f: db 0x00
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x8580-($-$$) nop
 
 A8580: db 0xa1
 A8581: db 0x30
@@ -34409,6 +34426,8 @@ A87e8: db 0x00
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
+times 0x87e9-($-$$) nop
+
 A87e9:
 	push es
 	push ds
@@ -34895,9 +34914,9 @@ A89cc: db 0x0d
 A89cd: db 0x01
 A89ce: ret
 
-times 0x89cf-($-$$) nop
-
 ; ---- ---- ---- ---- ---- ---- ---- ----
+
+times 0x89cf-($-$$) nop
 
 A89cf:
 	mov ax,0x5

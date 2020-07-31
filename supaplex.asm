@@ -79,7 +79,7 @@ wt:
         add     [ds:0x02bd], ax ; relocation  #3
         add     [ds:0x030e], ax ; relocation  #4
         add     [ds:0x03a9], ax ; relocation  #5
-        add     [ds:0x03f7], ax ; relocation  #6
+      ; add     [ds:0x03f7], ax ; relocation  #6
         add     [ds:0x058d], ax ; relocation  #7
         add     [ds:0x09ba], ax ; relocation  #8
         add     [ds:0x0b68], ax ; relocation  #9
