@@ -1,30 +1,12 @@
-; port		function
-;
-; 20		Programmable Interrupt Controller (PIC)
-; 40		Programmable Interval Timer (PIT)
-; 60		PS/2 keyboard
-; 3c0		VGA: Attribute Address/Data Register
-; 3c4		VGA: CRTC Controller Address Register
-; 3c8-3c9	VGA: DAC Address Write Mode Register, DAC Data Register
-; 3ce		VGA: Graphics Controller Address Register
-; 3d4		VGA: CRTC Controller Address Register
-;
-; interrupt	function
-;
-; 0x10		VGA: display functions such as mode change and palette
-; 0x1a		RTC: Real Time Clock BIOS services
-; 0x21		DOS: services such as file open, seek, read, write, close
-; 0x80-0x81	sound effects and music
-
-	mov dx, 0x3f60		; data segment				
-	mov ds, dx
-	mov ax, 0xa000
-	mov es, ax
+	mov dx,0x3f60		; data segment				
+	mov ds,dx
+	mov ax,0xa000
+	mov es,ax
 	call A254f
 	call A5340 		; set video mode
 	call A537f		; set palette
 	call A53a9
-	mov byte [0x630], 1
+	mov byte [0x630],0x1
 	call A1cee
 	call A0395
 	call A03e3
@@ -32,7 +14,7 @@
 	call A5820
 	call A55b9		; vga register stuff
 	call A5586		; vga register stuff
-	mov si, 0x605b
+	mov si,0x605b
 	call A566c
 	call A0a54		; open TITLE.DAT
 	mov si,0x5e9b
@@ -184,24 +166,17 @@ A00d4: db 0x02
 A00d5: db 0xe8
 A00d6: db 0x76
 A00d7: db 0x57
-	mov ax, 0x4c00
-	int 0x21 		; return to DOS
-A00dd: db 0x50
-A00de: db 0xe8
-A00df: db 0xc3
-A00e0: db 0x01
-A00e1: db 0xe8
-A00e2: db 0xbd
-A00e3: db 0x52
-A00e4: db 0xe8
-A00e5: db 0xdc
-A00e6: db 0x02
-A00e7: db 0x58
-A00e8: db 0xe8
-A00e9: db 0x65
-A00ea: db 0x16
-	mov ah, 0x4c
-	int 0x21 		; return to DOS
+	mov ax,0x4c00
+	int 0x21 ; return to DOS
+A00dd:
+	push ax
+	call A02a4
+	call A53a1
+	call A03c3
+	pop ax
+	call A1750
+	mov ah,0x4c
+	int 0x21 ; return to DOS
 A00ef: db 0xbe
 A00f0: db 0x1b
 A00f1: db 0x5f
@@ -211,9 +186,8 @@ A00f4: db 0x55
 A00f5: db 0xb8
 A00f6: db 0x00
 A00f7: db 0x3d
-	mov dx, 0x36ed		; TITLE2.DAT
-A00fb: db 0xcd
-A00fc: db 0x21
+	mov dx,0x36ed ; TITLE2.DAT
+	int 0x21
 A00fd: db 0x73
 A00fe: db 0x02
 A00ff: db 0xeb
@@ -221,9 +195,9 @@ A0100: db 0xdc
 A0101: db 0xa3
 A0102: db 0x66
 A0103: db 0x07
-	mov dx, 0x3ce
-	mov al, 1
-	out dx, al
+	mov dx,0x3ce
+	mov al,0x1
+	out dx,al
 A010a: db 0x42
 A010b: db 0xb0
 A010c: db 0x00
@@ -258,8 +232,7 @@ A0128: db 0x00
 A0129: db 0xba
 A012a: db 0x68
 A012b: db 0x07
-A012c: db 0xcd
-A012d: db 0x21
+	int 0x21
 A012e: db 0x73
 A012f: db 0x02
 A0130: db 0xeb
@@ -279,11 +252,9 @@ A013d: db 0x42
 A013e: db 0x8a
 A013f: db 0xc4
 A0140: db 0xee
-A0141: db 0xb9
-A0142: db 0x28
-A0143: db 0x00
-A0144: db 0xf3
-A0145: db 0xa4
+A0141:
+	mov cx, 20
+	rep movsw
 A0146: db 0x83
 A0147: db 0xef
 A0148: db 0x28
@@ -361,9 +332,8 @@ A018f: db 0x42
 A0190: db 0x8a
 A0191: db 0xc7
 A0192: db 0xee
-A0193: db 0xe8
-A0194: db 0x43
-A0195: db 0x53
+A0193:
+	call vsync
 A0196: db 0xc6
 A0197: db 0x06
 A0198: db 0x96
@@ -400,8 +370,8 @@ A01b3: db 0x57
 A01b4: db 0x16
 A01b5: db 0x7a
 A01b6:
-	mov dx,0x3d4	; CRTC Controller
-	mov al,0x18	; Line Compare Register
+	mov dx,0x3d4 ; CRTC Controller
+	mov al,0x18 ; Line Compare Register
 	out dx,al
 A01bc: db 0x42
 A01bd: db 0x8a
@@ -467,9 +437,8 @@ A01f8: db 0x42
 A01f9: db 0x8a
 A01fa: db 0xc7
 A01fb: db 0xee
-A01fc: db 0xe8
-A01fd: db 0xda
-A01fe: db 0x52
+A01fc:
+	call vsync
 A01ff: db 0xe8
 A0200: db 0xfc
 A0201: db 0x52
@@ -507,8 +476,8 @@ A021d: db 0x57
 A021e: db 0x16
 A021f: db 0x7a
 A0220:
-	mov dx,0x3d4	; CRTC Controller
-	mov al,0x18	; Line Compare Register
+	mov dx,0x3d4 ; CRTC Controller
+	mov al,0x18 ; Line Compare Register
 	out dx,al
 	inc dx
 A0227: db 0x8a
@@ -554,9 +523,8 @@ A024e: db 0x42
 A024f: db 0x8a
 A0250: db 0xc7
 A0251: db 0xee
-A0252: db 0xe8
-A0253: db 0x84
-A0254: db 0x52
+A0252:
+	call vsync
 A0255: db 0xe8
 A0256: db 0xa6
 A0257: db 0x52
@@ -597,9 +565,8 @@ A0273: db 0x51
 A0274: db 0xb9
 A0275: db 0x0a
 A0276: db 0x00
-A0277: db 0xe8
-A0278: db 0x5f
-A0279: db 0x52
+A0277:
+	call vsync
 A027a: db 0xe8
 A027b: db 0x81
 A027c: db 0x52
@@ -611,20 +578,20 @@ A0281: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
-	;;  Get and set keyboard interrupt
+	;  get and set keyboard interrupt
 A0282:
 	push ds
 	push es
-	mov ah, 0x35
-	mov al, 0x9
+	mov ah,0x35
+	mov al,0x9
 	int 0x21
-	mov [0x16ed], es
-	mov [0x16ef], bx
-	mov dx, 0x2b8	; offset address of keyboard interrupt
-	mov ax, 0x36c2	; segment address of code segment
-	mov ds, ax
-	mov ah, 0x25
-	mov al, 0x9
+	mov [0x16ed],es
+	mov [0x16ef],bx
+	mov dx,0x2b8 ; offset address of keyboard interrupt
+	mov ax,0x36c2 ; segment address of code segment
+	mov ds,ax
+	mov ah,0x25
+	mov al,0x9
 	int 0x21
 	pop es
 	pop ds
@@ -632,7 +599,8 @@ A0282:
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A02a3: ret
+A02a3:
+	ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -651,7 +619,7 @@ A02a4:
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
-	; Keyboard interrupt handler
+	; keyboard interrupt handler
 A02b8:
 	push ax
 	push bx
@@ -659,7 +627,7 @@ A02b8:
 	push ds
 	mov ax,0x3f60
 	mov ds,ax
-	in al,0x60	; PS/2 keyboard data port
+	in al,0x60 ; PS/2 keyboard data port
 	mov cl,al
 	mov bl,al
 	in al,0x61
@@ -700,8 +668,8 @@ A030a:
 	push ds
 	push dx
 	push ax
-	mov ax, 0x3f60
-	mov ds, ax
+	mov ax,0x3f60
+	mov ds,ax
 	cmp byte [0xd9e],0x0
 	jz A035f
 	mov al,[0xd9f]
@@ -740,8 +708,8 @@ A037b:
 	jnz A038d
 	mov byte [0xce78],0x0
 A038d:
-	mov al,0x20	; ACK interrupt
-	out 0x20,al	; Programmable Interrupt Controller (PIC) command port
+	mov al,0x20 ; ACK interrupt
+	out 0x20,al ; Programmable Interrupt Controller (PIC) command port
 	pop ax
 	pop dx
 	pop ds
@@ -754,7 +722,7 @@ times 0x0395-($-$$) nop
 A0395:
 	push ds
 	push es
-	mov ah,0x35	; get interrupt vector
+	mov ah,0x35 ; get interrupt vector
 	mov al,0x8
 	int 0x21
 	mov [0xd8c],es
@@ -762,13 +730,13 @@ A0395:
 	mov dx,0x30a
 	mov ax,0x36c2
 	mov ds,ax
-	mov ah,0x25	; set interrupt vector
+	mov ah,0x25 ; set interrupt vector
 	mov al,0x8
 	int 0x21
-	mov al,0x36	; set Programmable Interval Timer (PIT) rate
-	out 0x43,al	; PIT mode/command port
+	mov al,0x36 ; set Programmable Interval Timer (PIT) rate
+	out 0x43,al ; PIT mode/command port
 	mov al,0x38
-	out 0x40,al	; PIT channel 0 data port
+	out 0x40,al ; PIT channel 0 data port
 	mov al,0x5d
 	out 0x40,al
 	pop es
@@ -779,7 +747,8 @@ times 0x03c2-($-$$) nop
 	
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
-A03c2: ret
+A03c2:
+	ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -818,68 +787,27 @@ A03e2: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A03e3: db 0x1e
-A03e4: db 0x06
-A03e5: db 0xb4
-A03e6: db 0x35
-A03e7: db 0xb0
-A03e8: db 0x24
-A03e9: db 0xcd
-A03ea: db 0x21
-A03eb: db 0x8c
-A03ec: db 0x06
-A03ed: db 0x97
-A03ee: db 0x0d
-A03ef: db 0x89
-A03f0: db 0x1e
-A03f1: db 0x99
-A03f2: db 0x0d
-A03f3: db 0xba
-A03f4: db 0x18
-A03f5: db 0x04
-A03f6: db 0xb8
-A03f7: db 0xc2
-A03f8: db 0x36
-A03f9: db 0x8e
-A03fa: db 0xd8
-A03fb: db 0xb4
-A03fc: db 0x25
-A03fd: db 0xb0
-A03fe: db 0x24
-A03ff: db 0xcd
-A0400: db 0x21
-A0401: db 0x07
-A0402: db 0x1f
-A0403: ret
+	; install error handler
+A03e3:
+	ret
 
-; ---- ---- ---- ---- ---- ---- ---- ----
-	
-A0404: db 0x1e
-A0405: db 0x06
-A0406: db 0x8b
-A0407: db 0x16
-A0408: db 0x99
-A0409: db 0x0d
-A040a: db 0xa1
-A040b: db 0x97
-A040c: db 0x0d
-A040d: db 0x8e
-A040e: db 0xd8
-A040f: db 0xb4
-A0410: db 0x25
-A0411: db 0xb0
-A0412: db 0x24
-A0413: db 0xcd
-A0414: db 0x21
-A0415: db 0x07
-A0416: db 0x1f
-A0417: ret
+times 0x0404-($-$$) nop
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A0418: db 0xb0
-A0419: db 0x01
-A041a: iret
+	; restore error handler	
+A0404:
+	ret
+
+times 0x0418-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A0418:
+	mov al,0x1
+	iret
+
+times 0x041b-($-$$) nop
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
@@ -1070,15 +998,10 @@ A04d2: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A04d3: db 0xe8
-A04d4: db 0x94
-A04d5: db 0x53
-A04d6: db 0xc6
-A04d7: db 0x06
-A04d8: db 0x30
-A04d9: db 0x06
-A04da: db 0x00
-A04db: ret
+A04d3:
+	call A586a
+	mov byte [0x630],0x0
+	ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
@@ -1253,13 +1176,11 @@ A0583: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-; probably something useless as 3f2 is floppy disk controller port
-;	mov dx,0x3f2
-;	mov al,0xf
-;	out dx,al
+A0584:
 	ret
 
 times 0x058b-($-$$) nop
+
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
 A058b: db 0x06
@@ -1373,16 +1294,17 @@ A05f6: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 	
-A05f7: db 0x59
-A05f8: db 0x07
-A05f9: ret
+A05f7:
+	pop cx
+	pop es
+	ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
 A05fa: db 0xb8
 A05fb: db 0x00
 A05fc: db 0x3d
-	mov dx, 0x3776 		; PALETTES.DAT
+	mov dx,0x3776 ; PALETTES.DAT
 A0600: db 0xcd
 A0601: db 0x21
 A0602: db 0x73
@@ -1510,9 +1432,8 @@ A0678: db 0xb9
 A0679: db 0x02
 A067a: db 0x00
 A067b: db 0x51
-A067c: db 0xe8
-A067d: db 0x5a
-A067e: db 0x4e
+A067c:
+	call vsync
 A067f: db 0xe8
 A0680: db 0x7c
 A0681: db 0x4e
@@ -1633,9 +1554,8 @@ A06f3: db 0xb9
 A06f4: db 0x01
 A06f5: db 0x00
 A06f6: db 0x51
-A06f7: db 0xe8
-A06f8: db 0xdf
-A06f9: db 0x4d
+A06f7:
+	call vsync
 A06fa: db 0xe8
 A06fb: db 0x01
 A06fc: db 0x4e
@@ -1683,8 +1603,8 @@ A0724: ret
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
 A0725:
-	mov ax, 0x3d00
-	mov dx, 0x36e2 		; TITLE1.DAT
+	mov ax,0x3d00
+	mov dx,0x36e2 ; TITLE1.DAT
 A072b: db 0xcd
 A072c: db 0x21
 A072d: db 0x73
@@ -1767,11 +1687,9 @@ A0779: db 0x42
 A077a: db 0x8a
 A077b: db 0xc4
 A077c: db 0xee
-A077d: db 0xb9
-A077e: db 0x28
-A077f: db 0x00
-A0780: db 0xf3
-A0781: db 0xa4
+A077d:
+	mov cx,20
+	rep movsw
 A0782: db 0x83
 A0783: db 0xef
 A0784: db 0x28
@@ -1849,9 +1767,8 @@ A07cb: db 0x42
 A07cc: db 0x8a
 A07cd: db 0xc7
 A07ce: db 0xee
-A07cf: db 0xe8
-A07d0: db 0x07
-A07d1: db 0x4d
+A07cf:
+	call vsync
 A07d2: db 0xc6
 A07d3: db 0x06
 A07d4: db 0x96
@@ -1864,8 +1781,8 @@ A07da: db 0xe8
 A07db: db 0xce
 A07dc: db 0x4f
 A07dd:
-	mov ax, 0x3d00
-	mov dx, 0x36ed 		; TITLE2.DAT
+	mov ax,0x3d00
+	mov dx,0x36ed ; TITLE2.DAT
 	int 0x21
 A07e5: db 0x73
 A07e6: db 0x03
@@ -1937,11 +1854,9 @@ A0827: db 0x42
 A0828: db 0x8a
 A0829: db 0xc4
 A082a: db 0xee
-A082b: db 0xb9
-A082c: db 0x28
-A082d: db 0x00
-A082e: db 0xf3
-A082f: db 0xa4
+A082b:
+	mov cx,20
+	rep movsw
 A0830: db 0x83
 A0831: db 0xef
 A0832: db 0x28
@@ -1994,7 +1909,7 @@ A085d: db 0xc4
 A085e: db 0xfa
 A085f:
 	mov ax,0x3d00
-	mov dx, 0x36b0 ; MOVING.DAT
+	mov dx,0x36b0 ; MOVING.DAT
 	int 0x21
 A0867: db 0x73
 A0868: db 0x0f
@@ -2179,8 +2094,8 @@ A091a: db 0xe9
 A091b: db 0xc0
 A091c: db 0xf7
 A091d:
-	mov ax, 0x3d00
-	mov dx, 0x36bb 		; FIXED.DAT
+	mov ax,0x3d00
+	mov dx,0x36bb ; FIXED.DAT
 	int 0x21
 A0925: db 0x73
 A0926: db 0x03
@@ -2244,7 +2159,7 @@ A095c: ret
 A095d: db 0xb8
 A095e: db 0x00
 A095f: db 0x3d
-	mov dx, 0x36c5 		; PANEL.DAT
+	mov dx,0x36c5 ; PANEL.DAT
 A0963: db 0xcd
 A0964: db 0x21
 A0965: db 0x73
@@ -2308,7 +2223,7 @@ A099b: ret
 A099c: db 0xb8
 A099d: db 0x00
 A099e: db 0x3d
-	mov dx, 0x36f8 		; BACK.DAT
+	mov dx,0x36f8 ; BACK.DAT
 A09a2: db 0xcd
 A09a3: db 0x21
 A09a4: db 0x73
@@ -2380,7 +2295,7 @@ A09e2: ret
 A09e3: db 0xb8
 A09e4: db 0x00
 A09e5: db 0x3d
-	mov dx, 0x3709 		; CHARS6.DAT
+	mov dx,0x3709 ; CHARS6.DAT
 A09e9: db 0xcd
 A09ea: db 0x21
 A09eb: db 0x73
@@ -2440,7 +2355,7 @@ A0a20: db 0xf6
 A0a21: db 0xb8
 A0a22: db 0x00
 A0a23: db 0x3d
-	mov dx, 0x3714 		; CHARS8.DAT
+	mov dx,0x3714 ; CHARS8.DAT
 A0a27: db 0xcd
 A0a28: db 0x21
 A0a29: db 0x73
@@ -2516,9 +2431,8 @@ A0a6b: db 0x42
 A0a6c: db 0x8a
 A0a6d: db 0xc7
 A0a6e: db 0xee
-A0a6f: db 0xe8
-A0a70: db 0x67
-A0a71: db 0x4a
+A0a6f:
+	call vsync
 A0a72: db 0xc6
 A0a73: db 0x06
 A0a74: db 0x96
@@ -2612,11 +2526,9 @@ A0acb: db 0x42
 A0acc: db 0x8a
 A0acd: db 0xc4
 A0ace: db 0xee
-A0acf: db 0xb9
-A0ad0: db 0x28
-A0ad1: db 0x00
-A0ad2: db 0xf3
-A0ad3: db 0xa4
+A0acf:
+	mov cx,20
+	rep movsw
 A0ad4: db 0x83
 A0ad5: db 0xef
 A0ad6: db 0x28
@@ -2674,7 +2586,7 @@ A0b06: ret
 A0b07: db 0xb8
 A0b08: db 0x00
 A0b09: db 0x3d
-	mov dx, 0x371f 		; LEVEL.LST
+	mov dx,0x371f ; LEVEL.LST
 A0b0d: db 0xcd
 A0b0e: db 0x21
 A0b0f: db 0x73
@@ -2738,7 +2650,7 @@ A0b45: ret
 A0b46: db 0xb8
 A0b47: db 0x00
 A0b48: db 0x3d
-	mov dx, 0x3701 		; GFX.DAT
+	mov dx,0x3701 ; GFX.DAT
 A0b4c: db 0xcd
 A0b4d: db 0x21
 A0b4e: db 0x73
@@ -2810,7 +2722,7 @@ A0b8c: ret
 A0b8d: db 0xb8
 A0b8e: db 0x00
 A0b8f: db 0x3d
-	mov dx, 0x3729 		; CONTROLS.DAT
+	mov dx,0x3729 ; CONTROLS.DAT
 A0b93: db 0xcd
 A0b94: db 0x21
 A0b95: db 0x73
@@ -2882,7 +2794,7 @@ A0bd3: ret
 A0bd4: db 0xb8
 A0bd5: db 0x00
 A0bd6: db 0x3d
-	mov dx, 0x376b 		; PLAYER.LST
+	mov dx,0x376b ; PLAYER.LST
 A0bda: db 0xcd
 A0bdb: db 0x21
 A0bdc: db 0x72
@@ -3014,9 +2926,8 @@ A0c50: db 0x51
 A0c51: db 0x59
 A0c52: db 0x49
 A0c53: db 0x51
-A0c54: db 0xe8
-A0c55: db 0x82
-A0c56: db 0x48
+A0c54:
+	call vsync
 A0c57: db 0xe8
 A0c58: db 0xa4
 A0c59: db 0x48
@@ -4274,7 +4185,7 @@ A10df: db 0xff
 A10e0: db 0xff
 A10e1: ret
 	
-; ---- ---- ---- ---- ---- ---- ---- ----
+; ---- ---- ---- ---- ---- ---- ---- ---- fill more RETs down from here
 
 A10e2: db 0xfe
 A10e3: db 0xcb
@@ -5816,7 +5727,10 @@ A16e2: db 0x99
 A16e3: db 0x99
 A16e4: db 0x74
 A16e5: db 0x01
-A16e6: db 0xc3
+A16e6: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A16e7: db 0x80
 A16e8: db 0xbc
 A16e9: db 0xca
@@ -5910,7 +5824,10 @@ A1740: db 0x42
 A1741: db 0x17
 A1742: db 0x88
 A1743: db 0x88
-A1744: db 0xc3
+A1744: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A1745: db 0x00
 A1746: db 0x00
 A1747: db 0x00
@@ -5935,16 +5852,14 @@ A1759: db 0x00
 A175a: db 0x00
 A175b: db 0xb0
 A175c: db 0x00
-A175d: db 0xb9
-A175e: db 0xe8
-A175f: db 0x03
-A1760: db 0xf2
-A1761: db 0xae
+A175d:
+	mov cx,500
+	repne scasw
 A1762: db 0x4b
 A1763: db 0x75
 A1764: db 0xf8
 A1765:
-	mov ah,0xe	; VGA putchar
+	mov ah,0xe ; VGA putchar
 A1767: db 0x26
 A1768: db 0x8a
 A1769: db 0x05
@@ -5956,16 +5871,22 @@ A176e: db 0x47
 A176f: db 0xb7
 A1770: db 0x00
 A1771:
-	int 0x10
+	; int 0x10
+	nop
+	nop
 	jmp short A1765
-	mov ah, 0x0e	; VGA putchar
-	mov al, 0x0a
-	mov bh, 0
-	int 0x10
-	mov ah,0xe	; VGA putchar
+	mov ah,0x0e ; VGA putchar
+	mov al,0x0a
+	mov bh,0x0
+	; int 0x10
+	nop
+	nop
+	mov ah,0xe ; VGA putchar
 	mov al,0xd
 	mov bh,0x0
-	int 0x10
+	; int 0x10
+	nop
+	nop
 	pop es
 	ret
 
@@ -6365,9 +6286,8 @@ A190b: db 0x88
 A190c: db 0x26
 A190d: db 0x96
 A190e: db 0x0d
-A190f: db 0xe8
-A1910: db 0xc7
-A1911: db 0x3b
+A190f:
+	call vsync
 A1912: db 0x83
 A1913: db 0x3e
 A1914: db 0xf7
@@ -6388,9 +6308,8 @@ A1922: db 0x3e
 A1923: db 0xe8
 A1924: db 0xd8
 A1925: db 0x3b
-A1926: db 0xe8
-A1927: db 0xb0
-A1928: db 0x3b
+A1926:
+	call vsync
 A1929: db 0x51
 A192a: db 0xe8
 A192b: db 0x74
@@ -9078,32 +8997,8 @@ A23a4: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-	mov dx, 0x201
-	cli
-	mov cx, 0
-A23ac:
-	in al, dx
-	test ah, al
-	jz A23c0
-	loop A23ac
-	stc
-	jmp A23e8
-A23c0:
-	out dx, al
-	mov cx, 0
-A23ce:
-	in al, dx
-	test ah, al
-	jz A23e3
-	loop A23ce
-	stc
-	jmp A23e8
-A23e3:
-	neg cx
-	mov ax, cx
-	clc
-A23e8:
-	sti
+	; used to be some gameport stuff
+A23a5:
 	ret
 
 times 0x23ea-($-$$) nop
@@ -9471,8 +9366,8 @@ A254e: ret
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
 A254f:
-	mov ax,0x0	; Read system clock counter
-	int 0x1a	; System and Real Time Clock BIOS Services
+	mov ax,0x0 ; Read system clock counter
+	int 0x1a ; System and Real Time Clock BIOS Services
 	xor cx,dx
 	mov [0x6c2f],cx
 	ret
@@ -9779,14 +9674,11 @@ A2681: db 0x16
 A2682: db 0xbf
 A2683: db 0xba
 A2684: db 0x17
-A2685: db 0xb9
-A2686: db 0xa0
-A2687: db 0x05
-A2688: db 0xb8
-A2689: db 0x03
-A268a: db 0x00
-A268b: db 0xf2
-A268c: db 0xaf
+
+A2685:
+	mov cx,1440
+	mov ax,0x3
+	repne scasw
 A268d: db 0x4f
 A268e: db 0x4f
 A268f: db 0xb8
@@ -11697,7 +11589,7 @@ A2dff: db 0x00
 A2e00: db 0xb8
 A2e01: db 0x00
 A2e02: db 0x3d
-	mov dx, 0x36cf 		; MENU.DAT
+	mov dx,0x36cf ; MENU.DAT
 A2e06: db 0xcd
 A2e07: db 0x21
 A2e08: db 0x73
@@ -12338,9 +12230,8 @@ A3082: db 0xfb
 A3083: db 0x00
 A3084: db 0x75
 A3085: db 0xf8
-A3086: db 0xe8
-A3087: db 0x50
-A3088: db 0x24
+A3086:
+	call vsync
 A3089: db 0xe8
 A308a: db 0x8d
 A308b: db 0x23
@@ -12413,20 +12304,14 @@ A30cd: db 0x8c
 A30ce: db 0xd8
 A30cf: db 0x8e
 A30d0: db 0xc0
-A30d1: db 0xb9
-A30d2: db 0x08
-A30d3: db 0x00
-A30d4: db 0xb0
-A30d5: db 0x2d
-A30d6: db 0xf3
-A30d7: db 0xaa
-A30d8: db 0xb0
-A30d9: db 0x00
-A30da: db 0xb9
-A30db: db 0x78
-A30dc: db 0x00
-A30dd: db 0xf3
-A30de: db 0xaa
+A30d1:
+	mov cx,0x4
+	mov al,0x2d
+	rep stosw
+A30d8:
+	mov al,0x0
+	mov cx,60
+	rep stosw
 A30df: db 0x07
 A30e0: db 0xe8
 A30e1: db 0x25
@@ -12625,9 +12510,8 @@ A31a1: db 0xfb
 A31a2: db 0x00
 A31a3: db 0x75
 A31a4: db 0xf8
-A31a5: db 0xe8
-A31a6: db 0x31
-A31a7: db 0x23
+A31a5:
+	call vsync
 A31a8: db 0xe8
 A31a9: db 0x6e
 A31aa: db 0x22
@@ -13784,10 +13668,7 @@ A3628: db 0x0f
 A3629: db 0xe8
 A362a: db 0x29
 A362b: db 0x08
-A362c: db 0xb4
-A362d: db 0x19
-A362e: db 0xcd
-A362f: db 0x21
+A362c: times 0x3630-($-$$) nop ; get default drive
 A3630: db 0x3c
 A3631: db 0x00
 A3632: db 0x74
@@ -13889,20 +13770,10 @@ A3691: db 0x74
 A3692: db 0x37
 A3693: db 0xeb
 A3694: db 0xeb
-A3695: db 0xb4
-A3696: db 0x0e
-A3697: db 0xb2
-A3698: db 0x00
-A3699: db 0xcd
-A369a: db 0x21
+A3695: times 0x369b-($-$$) nop ; set default drive
 A369b: db 0xeb
 A369c: db 0x08
-A369d: db 0xb4
-A369e: db 0x0e
-A369f: db 0xb2
-A36a0: db 0x01
-A36a1: db 0xcd
-A36a2: db 0x21
+A369d: times 0x36a3-($-$$) nop ; set default drive
 A36a3: db 0xeb
 A36a4: db 0x00
 A36a5: db 0xe8
@@ -16778,21 +16649,15 @@ A41da: db 0xce
 A41db: db 0xe8
 A41dc: db 0xf0
 A41dd: db 0xf8
-A41de: db 0xb9
-A41df: db 0x1c
-A41e0: db 0x00
-A41e1: db 0x5e
-A41e2: db 0x56
-A41e3: db 0xbf
-A41e4: db 0xa6
-A41e5: db 0xc0
-A41e6: db 0x06
-A41e7: db 0x8c
-A41e8: db 0xd8
-A41e9: db 0x8e
-A41ea: db 0xc0
-A41eb: db 0xf3
-A41ec: db 0xa4
+A41de:
+	mov cx,14
+	pop si
+	push si
+	mov di,0xc0a6
+	push es
+	mov ax,ds
+	mov es,ax
+	rep movsw
 A41ed: db 0x07
 A41ee: db 0x5e
 A41ef: db 0x83
@@ -16886,11 +16751,9 @@ A4246: db 0x5d
 A4247: db 0xfd
 A4248: db 0x5e
 A4249: db 0x56
-A424a: db 0xb9
-A424b: db 0x08
-A424c: db 0x00
-A424d: db 0xf3
-A424e: db 0xa4
+A424a:
+	mov cx,0x4
+	rep movsw
 A424f: db 0x5e
 A4250: db 0x83
 A4251: db 0xc6
@@ -17073,16 +16936,12 @@ A4301: db 0x56
 A4302: db 0xbf
 A4303: db 0x9d
 A4304: db 0xc0
-A4305: db 0xb9
-A4306: db 0x08
-A4307: db 0x00
-A4308: db 0x06
-A4309: db 0x8c
-A430a: db 0xd8
-A430b: db 0x8e
-A430c: db 0xc0
-A430d: db 0xf3
-A430e: db 0xa4
+A4305:
+	mov cx,0x4
+	push es
+	mov ax,ds
+	mov es,ax
+	rep movsw
 A430f: db 0x07
 A4310: db 0x83
 A4311: db 0xee
@@ -17368,9 +17227,8 @@ A4428: db 0x06
 A4429: db 0x96
 A442a: db 0x0d
 A442b: db 0x00
-A442c: db 0xe8
-A442d: db 0xaa
-A442e: db 0x10
+A442c:
+	call vsync
 A442f: db 0xbb
 A4430: db 0x84
 A4431: db 0x4d
@@ -17423,11 +17281,9 @@ A445f: db 0x8c
 A4460: db 0xc0
 A4461: db 0x8e
 A4462: db 0xd8
-A4463: db 0xb9
-A4464: db 0x28
-A4465: db 0x00
-A4466: db 0xf3
-A4467: db 0xa4
+A4463:
+	mov cx,20
+	rep movsw
 A4468: db 0x83
 A4469: db 0xc6
 A446a: db 0x52
@@ -17527,9 +17383,8 @@ A44c7: db 0x06
 A44c8: db 0x96
 A44c9: db 0x0d
 A44ca: db 0x07
-A44cb: db 0xe8
-A44cc: db 0x0b
-A44cd: db 0x10
+A44cb:
+	call vsync
 A44ce: db 0xe8
 A44cf: db 0x2d
 A44d0: db 0x10
@@ -17538,9 +17393,8 @@ A44d2: db 0x06
 A44d3: db 0x96
 A44d4: db 0x0d
 A44d5: db 0x03
-A44d6: db 0xe8
-A44d7: db 0x00
-A44d8: db 0x10
+A44d6:
+	call vsync
 A44d9: db 0xe8
 A44da: db 0x22
 A44db: db 0x10
@@ -17585,9 +17439,8 @@ A4501: db 0x06
 A4502: db 0x96
 A4503: db 0x0d
 A4504: db 0x00
-A4505: db 0xe8
-A4506: db 0xd1
-A4507: db 0x0f
+A4505:
+	call vsync
 A4508: db 0xc3
 A4509: db 0xbe
 A450a: db 0x5b
@@ -17766,9 +17619,8 @@ A45b6: db 0x06
 A45b7: db 0x96
 A45b8: db 0x0d
 A45b9: db 0x00
-A45ba: db 0xe8
-A45bb: db 0x1c
-A45bc: db 0x0f
+A45ba:
+	call vsync
 A45bd: db 0xbb
 A45be: db 0x5c
 A45bf: db 0x4d
@@ -17823,9 +17675,8 @@ A45ef: db 0x06
 A45f0: db 0x96
 A45f1: db 0x0d
 A45f2: db 0x01
-A45f3: db 0xe8
-A45f4: db 0xe3
-A45f5: db 0x0e
+A45f3:
+	call vsync
 A45f6: db 0xe8
 A45f7: db 0x05
 A45f8: db 0x0f
@@ -17834,9 +17685,8 @@ A45fa: db 0x06
 A45fb: db 0x96
 A45fc: db 0x0d
 A45fd: db 0x05
-A45fe: db 0xe8
-A45ff: db 0xd8
-A4600: db 0x0e
+A45fe:
+	call vsync
 A4601: db 0xe8
 A4602: db 0xfa
 A4603: db 0x0e
@@ -17881,18 +17731,16 @@ A4629: db 0x06
 A462a: db 0x96
 A462b: db 0x0d
 A462c: db 0x00
-A462d: db 0xe8
-A462e: db 0xa9
-A462f: db 0x0e
+A462d:
+	call vsync
 A4630: db 0xc3
 A4631: db 0xc6
 A4632: db 0x06
 A4633: db 0x96
 A4634: db 0x0d
 A4635: db 0x00
-A4636: db 0xe8
-A4637: db 0xa0
-A4638: db 0x0e
+A4636:
+	call vsync
 A4639: db 0xbb
 A463a: db 0x5c
 A463b: db 0x4d
@@ -17944,9 +17792,8 @@ A4668: db 0x06
 A4669: db 0x96
 A466a: db 0x0d
 A466b: db 0x01
-A466c: db 0xe8
-A466d: db 0x6a
-A466e: db 0x0e
+A466c:
+	call vsync
 A466f: db 0xe8
 A4670: db 0x8c
 A4671: db 0x0e
@@ -17955,9 +17802,8 @@ A4673: db 0x06
 A4674: db 0x96
 A4675: db 0x0d
 A4676: db 0x05
-A4677: db 0xe8
-A4678: db 0x5f
-A4679: db 0x0e
+A4677:
+	call vsync
 A467a: db 0xe8
 A467b: db 0x81
 A467c: db 0x0e
@@ -18002,9 +17848,8 @@ A46a2: db 0x06
 A46a3: db 0x96
 A46a4: db 0x0d
 A46a5: db 0x00
-A46a6: db 0xe8
-A46a7: db 0x30
-A46a8: db 0x0e
+A46a6:
+	call vsync
 A46a9: db 0xc3
 A46aa: db 0x1e
 A46ab: db 0xb8
@@ -18064,11 +17909,9 @@ A46e0: db 0x42
 A46e1: db 0x8a
 A46e2: db 0xc4
 A46e3: db 0xee
-A46e4: db 0xb9
-A46e5: db 0x28
-A46e6: db 0x00
-A46e7: db 0xf3
-A46e8: db 0xa4
+A46e4:
+	mov cx,20
+	rep movsw
 A46e9: db 0x83
 A46ea: db 0xef
 A46eb: db 0x28
@@ -18175,11 +18018,9 @@ A474f: db 0x42
 A4750: db 0x8a
 A4751: db 0xc4
 A4752: db 0xee
-A4753: db 0xb9
-A4754: db 0x28
-A4755: db 0x00
-A4756: db 0xf3
-A4757: db 0xa4
+A4753:
+	mov cx,20
+	rep movsw
 A4758: db 0x83
 A4759: db 0xef
 A475a: db 0x28
@@ -18286,11 +18127,9 @@ A47be: db 0x42
 A47bf: db 0x8a
 A47c0: db 0xc4
 A47c1: db 0xee
-A47c2: db 0xb9
-A47c3: db 0x28
-A47c4: db 0x00
-A47c5: db 0xf3
-A47c6: db 0xa4
+A47c2:
+	mov cx,20
+	rep movsw
 A47c7: db 0x83
 A47c8: db 0xef
 A47c9: db 0x28
@@ -18387,11 +18226,9 @@ A4823: db 0x42
 A4824: db 0x8a
 A4825: db 0xc4
 A4826: db 0xee
-A4827: db 0xb9
-A4828: db 0x28
-A4829: db 0x00
-A482a: db 0xf3
-A482b: db 0xa4
+A4827:
+	mov cx,20
+	rep movsw
 A482c: db 0x83
 A482d: db 0xef
 A482e: db 0x28
@@ -18645,9 +18482,8 @@ A4925: db 0x06
 A4926: db 0x96
 A4927: db 0x0d
 A4928: db 0x00
-A4929: db 0xe8
-A492a: db 0xad
-A492b: db 0x0b
+A4929:
+	call vsync
 A492c: db 0xbe
 A492d: db 0x9b
 A492e: db 0x5f
@@ -18703,9 +18539,8 @@ A495f: db 0xe8
 A4960: db 0x4c
 A4961: db 0x07
 A4962: db 0xc3
-A4963: db 0xe8
-A4964: db 0x73
-A4965: db 0x0b
+A4963:
+	call vsync
 A4966: db 0xff
 A4967: db 0x06
 A4968: db 0x4d
@@ -19181,9 +19016,8 @@ A4b3d: db 0xed
 A4b3e: db 0xe8
 A4b3f: db 0xec
 A4b40: db 0xed
-A4b41: db 0xe8
-A4b42: db 0x95
-A4b43: db 0x09
+A4b41:
+	call vsync
 A4b44: db 0xe8
 A4b45: db 0xcf
 A4b46: db 0x02
@@ -19286,9 +19120,8 @@ A4ba6: db 0x14
 A4ba7: db 0xff
 A4ba8: db 0x54
 A4ba9: db 0x08
-A4baa: db 0xe8
-A4bab: db 0x2c
-A4bac: db 0x09
+A4baa:
+	call vsync
 A4bad: db 0xff
 A4bae: db 0x06
 A4baf: db 0x4d
@@ -21172,21 +21005,17 @@ A5304: db 0x83
 A5305: db 0xee
 A5306: db 0x0c
 A5307: db 0xfd
-A5308: db 0xb9
-A5309: db 0x24
-A530a: db 0x00
-A530b: db 0xf3
-A530c: db 0xa4
+A5308:
+	mov cx,18
+	rep movsw
 A530d: db 0xfc
 A530e: db 0x5e
 A530f: db 0x83
 A5310: db 0xef
 A5311: db 0x0b
-A5312: db 0xb9
-A5313: db 0x0c
-A5314: db 0x00
-A5315: db 0xf3
-A5316: db 0xa4
+A5312:
+	mov cx,0x6
+	rep movsw
 A5317: db 0x07
 A5318: db 0xc3
 A5319: db 0xa0
@@ -21239,7 +21068,7 @@ A5344: db 0xa2
 A5345: db 0x10
 A5346: db 0x06
 A5347:
-	mov ax,0xd	; VGA mode 0x0d, 320x200 at 16 colors
+	mov ax,0xd ; VGA mode d
 	int 0x10
 A534c: db 0xbb
 A534d: db 0x00
@@ -21309,7 +21138,7 @@ A5387: db 0x10
 A5388: db 0x00
 A5389: db 0x51
 A538a:
-	mov ax,0x1000	; set/get palette registers (EGA/VGA)
+	mov ax,0x1000 ; set/get palette registers (EGA/VGA)
 A538d: db 0x8a
 A538e: db 0xd9
 A538f: db 0xfe
@@ -21317,7 +21146,7 @@ A5390: db 0xcb
 A5391: db 0x8a
 A5392: db 0xfb
 A5393:
-	int 0x10
+	int 0x10 ; needed for palette
 A5395: db 0x59
 A5396: db 0xe2
 A5397: db 0xf1
@@ -21334,8 +21163,7 @@ A53a0: db 0xc3
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
 A53a1:
-	mov ah,0x0
-	mov al,[0x610]
+	mov ax,0x3
 	int 0x10
 	ret
 
@@ -21348,25 +21176,23 @@ A53a9:
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A53aa: ; remove mouse routines and use area for resync
-        push    ax
-        mov     ah, [cs:cnt]
-        inc     ah
-        cmp     ah, 69
-        jne     pass
-        mov     al, 0x36
-        out     0x43, al
-        mov     al, 0x38
-        out     0x40, al
-        mov     al, 0x5d
-        out     0x40, al
-        xor     ah, ah
+resync:
+        mov ah,[cs:cnt]
+        inc ah
+        cmp ah,69
+        jne pass
+        mov al,0x36
+        out 0x43,al
+        mov al,0x38
+        out 0x40,al
+        mov al,0x5d
+        out 0x40,al
+        xor ah,ah
 pass:
-        mov     [cs:cnt], ah
-        pop     ax
+        mov [cs:cnt],ah
         ret
 cnt:
-        db      0
+        db 0
 
 times 0x540f-($-$$) nop
 
@@ -21412,10 +21238,10 @@ A5430: db 0x01
 A5431: db 0x75
 A5432: db 0x03
 A5433:
-	mov bx, 2
-	cmp byte [0x167b], 1 	; use menu with backspace
+	mov bx,0x2
+	cmp byte [0x167b],0x1 ; use menu with backspace
 	jnz A5440
-	mov bx, 1
+	mov bx,0x1
 A5440: db 0xb9
 A5441: db 0x01
 A5442: db 0x00
@@ -21572,53 +21398,39 @@ A54d8: ret
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A54d9:
-	push	dx
-	push	ax
-A54db:
-        mov     dx, 0x03da	; begin resync
-A54de:
-        in      al, dx
-        test    al, 8
-        je      A54de
-        mov     dx, 0x03c0
-        mov     al, 0x33
-        out     dx, al
-        mov     al, [0x0d96]
-        out     dx, al
-        pop     ax
-        pop     dx
-        call    A53aa
-        ret			; end resync
-
-times 0x54f3-($-$$) nop
-
-; ---- ---- ---- ---- ---- ---- ---- ----
-
-A54f3: db 0xb0
-A54f4: db 0x33
-A54f5: db 0xee
-A54f6: db 0xa0
-A54f7: db 0x96
-A54f8: db 0x0d
-A54f9: db 0xee
-A54fa: db 0xfb
-A54fb: db 0x58
-A54fc: db 0x5a
-A54fd: ret
-
-; ---- ---- ---- ---- ---- ---- ---- ----
-
-A54fe:
+vsync:
 	push dx
 	push ax
-A5500:
-	mov dx, 0x3da
-	in al,dx
-	test al, 8
-	jnz A5500
-	pop ax
-	pop dx
+        mov dx,0x3da
+A54de:
+        in al,dx
+        test al,0x8
+        je A54de
+        mov dx,0x3c0
+        mov al,0x33
+        out dx,al
+        mov al,[0x0d96]
+        out dx,al
+        call resync
+        pop ax
+        pop dx
+        ret
+
+times 0x54fe-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+	; vsync for menu etc.
+A54fe:
+;	push dx
+;	push ax
+;A5500:
+;	mov dx,0x3da
+;	in al,dx
+;	test al,0x8
+;	jnz A5500
+;	pop ax
+;	pop dx
 	ret
 
 times 0x550b-($-$$) nop
@@ -21712,9 +21524,8 @@ A555e: db 0x42
 A555f: db 0xb0
 A5560: db 0x80
 A5561: db 0xee
-A5562: db 0xe8
-A5563: db 0x74
-A5564: db 0xff
+A5562:
+	call vsync
 A5565: db 0xec
 A5566: db 0xba
 A5567: db 0xc0
@@ -21839,9 +21650,8 @@ A55dd: db 0x42
 A55de: db 0xb0
 A55df: db 0xff
 A55e0: db 0xee
-A55e1: db 0xb9
-A55e2: db 0xff
-A55e3: db 0xff
+A55e1:
+	mov cx,0xffff
 A55e4: db 0xbf
 A55e5: db 0x00
 A55e6: db 0x00
@@ -21957,11 +21767,9 @@ A5653: db 0xba
 A5654: db 0x23
 A5655: db 0x32
 A5656: db 0xc0
-A5657: db 0xb9
-A5658: db 0x00
-A5659: db 0x06
-A565a: db 0xf3
-A565b: db 0xaa
+A5657:
+	mov cx,768
+	rep stosw
 A565c: db 0x07
 A565d: db 0xb8
 A565e: db 0x00
@@ -22258,9 +22066,8 @@ A5780: db 0x03
 A5781: db 0xe9
 A5782: db 0x56
 A5783: db 0xff
-A5784: db 0xe8
-A5785: db 0x52
-A5786: db 0xfd
+A5784:
+	call vsync
 A5787: db 0xe8
 A5788: db 0x74
 A5789: db 0xfd
@@ -22296,7 +22103,11 @@ A57a6: db 0x07
 A57a7: db 0x8b
 A57a8: db 0xe5
 A57a9: db 0x5d
-A57aa: db 0xc3
+A57aa: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+	; some palette handling stuff
 A57ab: db 0x55
 A57ac: db 0x8b
 A57ad: db 0xec
@@ -22391,9 +22202,11 @@ A5805:
 	push es
 	mov ax,ds
 	mov es,ax
-	mov ax,0x1002	; Set/get palette registers (EGA/VGA)
-	mov dx,0x611	; ES:DX = pointer to 17 byte table representing 16 palette registers and border color register
-	int 0x10
+	mov ax,0x1002 ; Set/get palette registers (EGA/VGA)
+	mov dx,0x611 ; ES:DX = pointer to 17 byte table representing 16 palette registers and border color register
+	; int 0x10 ; doesn't seem to be needed
+	nop
+	nop
 	pop es
 	mov ax,[bp-0x2]
 	mov [0xd92],ax
@@ -22453,16 +22266,19 @@ A5849: db 0x06
 A584a: db 0x72
 A584b: db 0xce
 A584c: db 0x00
-A584d: db 0xc3
-A584e: db 0xc6
-A584f: db 0x06
-A5850: db 0x72
-A5851: db 0xce
-A5852: db 0x00
-A5853: db 0xe8
-A5854: db 0xcb
-A5855: db 0x01
-A5856: db 0xc3
+A584d: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A584e:
+	mov byte [0xce72],0x0
+	call A5a21
+	ret
+
+times 0x5857-($-$$) nop
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A5857: db 0xe8
 A5858: db 0xc7
 A5859: db 0x01
@@ -22656,7 +22472,7 @@ A5914: db 0x14
 A5915: db 0xe8
 A5916: db 0x9f
 A5917: db 0x00
-	mov dx, 0x375f 		; BLASTER.SND
+	mov dx,0x375f ; BLASTER.SND
 A591b: db 0xb9
 A591c: db 0x1b
 A591d: db 0x99
@@ -22709,7 +22525,7 @@ A594b: db 0xba
 A594c: db 0x54
 A594d: db 0x37
 A594e:
-	mov	cx, 36123 ; size of BLASTER.SND
+	mov cx,36123 ; size of BLASTER.SND
 A5951: db 0xe8
 A5952: db 0x63
 A5953: db 0x00
@@ -22759,7 +22575,7 @@ A597e: db 0xba
 A597f: db 0x54
 A5980: db 0x37
 A5981:
-	mov	cx, 36123 ; size of BLASTER.SND
+	mov cx,36123 ; size of BLASTER.SND
 A5984: db 0xe8
 A5985: db 0x30
 A5986: db 0x00
@@ -22882,9 +22698,9 @@ A59fa: db 0x1e
 A59fb: db 0x66
 A59fc: db 0x07
 A59fd: db 0x1e
-	mov ax, 0x4eb6 		; segment address for BLASTER.SND (reloc. c61f) ... dec2hex(16*hex2dec('3000')+hex2dec('c61f')-224288)
-	mov ds, ax
-	mov ax, 0x3f00
+	mov ax,0x4eb6 ; segment address for BLASTER.SND (reloc. c61f) ... dec2hex(16*hex2dec('3000')+hex2dec('c61f')-224288)
+	mov ds,ax
+	mov ax,0x3f00
 A5a06: db 0xba
 A5a07: db 0x00
 A5a08: db 0x00
@@ -30214,7 +30030,10 @@ A76c8: db 0xba
 A76c9: db 0x17
 A76ca: db 0x11
 A76cb: db 0x28
-A76cc: db 0xc3
+A76cc: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ---- fill more RETs up from here
+
 A76cd: db 0xa1
 A76ce: db 0x4d
 A76cf: db 0x16
@@ -30228,7 +30047,10 @@ A76d6: db 0xf8
 A76d7: db 0x03
 A76d8: db 0x74
 A76d9: db 0x45
-A76da: db 0xc3
+A76da: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A76db: db 0x1e
 A76dc: db 0x56
 A76dd: db 0x8b
@@ -30272,7 +30094,10 @@ A7702: db 0x88
 A7703: db 0x9c
 A7704: db 0xbb
 A7705: db 0x17
-A7706: db 0xc3
+A7706: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7707: db 0x80
 A7708: db 0xfc
 A7709: db 0x1b
@@ -30296,7 +30121,10 @@ A771a: db 0x03
 A771b: db 0xe8
 A771c: db 0x31
 A771d: db 0xb2
-A771e: db 0xc3
+A771e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A771f: db 0x8a
 A7720: db 0x9c
 A7721: db 0xbb
@@ -30321,7 +30149,10 @@ A7733: db 0xfb
 A7734: db 0x0e
 A7735: db 0x74
 A7736: db 0x24
-A7737: db 0xc3
+A7737: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7738: db 0x83
 A7739: db 0xbc
 A773a: db 0x42
@@ -30340,7 +30171,10 @@ A7746: db 0x17
 A7747: db 0x03
 A7748: db 0x74
 A7749: db 0xbd
-A774a: db 0xc3
+A774a: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A774b: db 0xc7
 A774c: db 0x84
 A774d: db 0xba
@@ -30356,7 +30190,10 @@ A7756: db 0xba
 A7757: db 0x17
 A7758: db 0x11
 A7759: db 0x10
-A775a: db 0xc3
+A775a: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A775b: db 0x83
 A775c: db 0xbc
 A775d: db 0xb8
@@ -30375,7 +30212,10 @@ A7769: db 0x17
 A776a: db 0x03
 A776b: db 0x74
 A776c: db 0x9a
-A776d: db 0xc3
+A776d: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A776e: db 0xc7
 A776f: db 0x84
 A7770: db 0xba
@@ -30391,7 +30231,10 @@ A7779: db 0xba
 A777a: db 0x17
 A777b: db 0x11
 A777c: db 0x18
-A777d: db 0xc3
+A777d: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A777e: db 0x83
 A777f: db 0xbc
 A7780: db 0x32
@@ -30413,7 +30256,10 @@ A778f: db 0x03
 A7790: db 0xe9
 A7791: db 0x74
 A7792: db 0xff
-A7793: db 0xc3
+A7793: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7794: db 0xc7
 A7795: db 0x84
 A7796: db 0xba
@@ -30429,7 +30275,10 @@ A779f: db 0xba
 A77a0: db 0x17
 A77a1: db 0x11
 A77a2: db 0x20
-A77a3: db 0xc3
+A77a3: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A77a4: db 0x83
 A77a5: db 0xbc
 A77a6: db 0xbc
@@ -30451,7 +30300,10 @@ A77b5: db 0x03
 A77b6: db 0xe9
 A77b7: db 0x4e
 A77b8: db 0xff
-A77b9: db 0xc3
+A77b9: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A77ba: db 0xc7
 A77bb: db 0x84
 A77bc: db 0xba
@@ -30467,7 +30319,10 @@ A77c5: db 0xba
 A77c6: db 0x17
 A77c7: db 0x11
 A77c8: db 0x28
-A77c9: db 0xc3
+A77c9: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A77ca: db 0x56
 A77cb: db 0x8b
 A77cc: db 0xbc
@@ -30540,7 +30395,10 @@ A780e: db 0x88
 A780f: db 0x9c
 A7810: db 0xbb
 A7811: db 0x17
-A7812: db 0xc3
+A7812: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7813: db 0xc7
 A7814: db 0x84
 A7815: db 0xba
@@ -30559,7 +30417,10 @@ A7821: db 0x84
 A7822: db 0xbb
 A7823: db 0x17
 A7824: db 0x01
-A7825: db 0xc3
+A7825: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7826: db 0x80
 A7827: db 0xbc
 A7828: db 0xb8
@@ -30572,7 +30433,10 @@ A782e: db 0x84
 A782f: db 0xbb
 A7830: db 0x17
 A7831: db 0x01
-A7832: db 0xc3
+A7832: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7833: db 0x83
 A7834: db 0xbc
 A7835: db 0x42
@@ -30595,7 +30459,10 @@ A7845: db 0xba
 A7846: db 0x17
 A7847: db 0x11
 A7848: db 0x10
-A7849: db 0xc3
+A7849: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A784a: db 0x80
 A784b: db 0xbc
 A784c: db 0x42
@@ -30606,7 +30473,10 @@ A7850: db 0x04
 A7851: db 0xe8
 A7852: db 0xfb
 A7853: db 0xb0
-A7854: db 0xc3
+A7854: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7855: db 0x83
 A7856: db 0xbc
 A7857: db 0xbc
@@ -30619,7 +30489,10 @@ A785d: db 0x84
 A785e: db 0xbb
 A785f: db 0x17
 A7860: db 0x09
-A7861: db 0xc3
+A7861: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7862: db 0x80
 A7863: db 0xbc
 A7864: db 0xbc
@@ -30632,13 +30505,19 @@ A786a: db 0x84
 A786b: db 0xbb
 A786c: db 0x17
 A786d: db 0x09
-A786e: db 0xc3
+A786e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A786f: db 0xc6
 A7870: db 0x84
 A7871: db 0xbb
 A7872: db 0x17
 A7873: db 0x01
-A7874: db 0xc3
+A7874: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7875: db 0x56
 A7876: db 0x8b
 A7877: db 0xbc
@@ -30706,7 +30585,10 @@ A78b4: db 0x88
 A78b5: db 0x9c
 A78b6: db 0xbb
 A78b7: db 0x17
-A78b8: db 0xc3
+A78b8: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A78b9: db 0xc7
 A78ba: db 0x84
 A78bb: db 0xba
@@ -30725,7 +30607,10 @@ A78c7: db 0x84
 A78c8: db 0xbb
 A78c9: db 0x17
 A78ca: db 0x03
-A78cb: db 0xc3
+A78cb: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A78cc: db 0x80
 A78cd: db 0xbc
 A78ce: db 0x32
@@ -30738,7 +30623,10 @@ A78d4: db 0x84
 A78d5: db 0xbb
 A78d6: db 0x17
 A78d7: db 0x03
-A78d8: db 0xc3
+A78d8: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A78d9: db 0x83
 A78da: db 0xbc
 A78db: db 0xb8
@@ -30761,7 +30649,10 @@ A78eb: db 0xba
 A78ec: db 0x17
 A78ed: db 0x11
 A78ee: db 0x18
-A78ef: db 0xc3
+A78ef: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A78f0: db 0x80
 A78f1: db 0xbc
 A78f2: db 0xb8
@@ -30772,7 +30663,10 @@ A78f6: db 0x04
 A78f7: db 0xe8
 A78f8: db 0x55
 A78f9: db 0xb0
-A78fa: db 0xc3
+A78fa: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A78fb: db 0x83
 A78fc: db 0xbc
 A78fd: db 0x42
@@ -30785,7 +30679,10 @@ A7903: db 0x84
 A7904: db 0xbb
 A7905: db 0x17
 A7906: db 0x0f
-A7907: db 0xc3
+A7907: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7908: db 0x80
 A7909: db 0xbc
 A790a: db 0x42
@@ -30798,13 +30695,19 @@ A7910: db 0x84
 A7911: db 0xbb
 A7912: db 0x17
 A7913: db 0x0f
-A7914: db 0xc3
+A7914: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7915: db 0xc6
 A7916: db 0x84
 A7917: db 0xbb
 A7918: db 0x17
 A7919: db 0x03
-A791a: db 0xc3
+A791a: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A791b: db 0x56
 A791c: db 0x8b
 A791d: db 0xbc
@@ -30879,7 +30782,10 @@ A7961: db 0x88
 A7962: db 0x9c
 A7963: db 0xbb
 A7964: db 0x17
-A7965: db 0xc3
+A7965: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7966: db 0xc7
 A7967: db 0x84
 A7968: db 0xba
@@ -30898,7 +30804,10 @@ A7974: db 0x84
 A7975: db 0xbb
 A7976: db 0x17
 A7977: db 0x05
-A7978: db 0xc3
+A7978: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7979: db 0x80
 A797a: db 0xbc
 A797b: db 0xbc
@@ -30911,7 +30820,10 @@ A7981: db 0x84
 A7982: db 0xbb
 A7983: db 0x17
 A7984: db 0x05
-A7985: db 0xc3
+A7985: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7986: db 0x83
 A7987: db 0xbc
 A7988: db 0x32
@@ -30934,7 +30846,10 @@ A7998: db 0xba
 A7999: db 0x17
 A799a: db 0x11
 A799b: db 0x20
-A799c: db 0xc3
+A799c: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A799d: db 0x80
 A799e: db 0xbc
 A799f: db 0x32
@@ -30945,7 +30860,10 @@ A79a3: db 0x04
 A79a4: db 0xe8
 A79a5: db 0xa8
 A79a6: db 0xaf
-A79a7: db 0xc3
+A79a7: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A79a8: db 0x83
 A79a9: db 0xbc
 A79aa: db 0xb8
@@ -30958,7 +30876,10 @@ A79b0: db 0x84
 A79b1: db 0xbb
 A79b2: db 0x17
 A79b3: db 0x0d
-A79b4: db 0xc3
+A79b4: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A79b5: db 0x80
 A79b6: db 0xbc
 A79b7: db 0xb8
@@ -30971,13 +30892,19 @@ A79bd: db 0x84
 A79be: db 0xbb
 A79bf: db 0x17
 A79c0: db 0x0d
-A79c1: db 0xc3
+A79c1: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A79c2: db 0xc6
 A79c3: db 0x84
 A79c4: db 0xbb
 A79c5: db 0x17
 A79c6: db 0x05
-A79c7: db 0xc3
+A79c7: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A79c8: db 0x56
 A79c9: db 0x8b
 A79ca: db 0xbc
@@ -31046,7 +30973,10 @@ A7a08: db 0x88
 A7a09: db 0x9c
 A7a0a: db 0xbb
 A7a0b: db 0x17
-A7a0c: db 0xc3
+A7a0c: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a0d: db 0xc7
 A7a0e: db 0x84
 A7a0f: db 0xba
@@ -31065,7 +30995,10 @@ A7a1b: db 0x84
 A7a1c: db 0xbb
 A7a1d: db 0x17
 A7a1e: db 0x07
-A7a1f: db 0xc3
+A7a1f: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a20: db 0x80
 A7a21: db 0xbc
 A7a22: db 0x42
@@ -31078,7 +31011,10 @@ A7a28: db 0x84
 A7a29: db 0xbb
 A7a2a: db 0x17
 A7a2b: db 0x07
-A7a2c: db 0xc3
+A7a2c: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a2d: db 0x83
 A7a2e: db 0xbc
 A7a2f: db 0xbc
@@ -31101,7 +31037,10 @@ A7a3f: db 0xba
 A7a40: db 0x17
 A7a41: db 0x11
 A7a42: db 0x28
-A7a43: db 0xc3
+A7a43: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a44: db 0x80
 A7a45: db 0xbc
 A7a46: db 0xbc
@@ -31112,7 +31051,10 @@ A7a4a: db 0x04
 A7a4b: db 0xe8
 A7a4c: db 0x01
 A7a4d: db 0xaf
-A7a4e: db 0xc3
+A7a4e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a4f: db 0x83
 A7a50: db 0xbc
 A7a51: db 0x32
@@ -31125,7 +31067,10 @@ A7a57: db 0x84
 A7a58: db 0xbb
 A7a59: db 0x17
 A7a5a: db 0x0b
-A7a5b: db 0xc3
+A7a5b: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a5c: db 0x80
 A7a5d: db 0xbc
 A7a5e: db 0x32
@@ -31138,13 +31083,19 @@ A7a64: db 0x84
 A7a65: db 0xbb
 A7a66: db 0x17
 A7a67: db 0x0b
-A7a68: db 0xc3
+A7a68: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a69: db 0xc6
 A7a6a: db 0x84
 A7a6b: db 0xbb
 A7a6c: db 0x17
 A7a6d: db 0x07
-A7a6e: db 0xc3
+A7a6e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a6f: db 0x80
 A7a70: db 0x3e
 A7a71: db 0xc7
@@ -31178,7 +31129,10 @@ A7a8c: db 0x74
 A7a8d: db 0x02
 A7a8e: db 0xff
 A7a8f: db 0xd0
-A7a90: db 0xc3
+A7a90: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a91: db 0xa1
 A7a92: db 0x4d
 A7a93: db 0x16
@@ -31192,7 +31146,10 @@ A7a9a: db 0xf8
 A7a9b: db 0x03
 A7a9c: db 0x74
 A7a9d: db 0x2f
-A7a9e: db 0xc3
+A7a9e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7a9f: db 0x1e
 A7aa0: db 0x56
 A7aa1: db 0x53
@@ -31234,11 +31191,16 @@ A7ac4: db 0x88
 A7ac5: db 0x9c
 A7ac6: db 0xbb
 A7ac7: db 0x17
-A7ac8: db 0xc3
-A7ac9: db 0xe8
-A7aca: db 0x83
-A7acb: db 0xae
-A7acc: db 0xc3
+A7ac8: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A7ac9:
+	call A294f
+	ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7acd: db 0x8a
 A7ace: db 0x9c
 A7acf: db 0xbb
@@ -31263,7 +31225,10 @@ A7ae1: db 0xfb
 A7ae2: db 0x06
 A7ae3: db 0x74
 A7ae4: db 0x5e
-A7ae5: db 0xc3
+A7ae5: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7ae6: db 0x83
 A7ae7: db 0xbc
 A7ae8: db 0x42
@@ -31278,7 +31243,10 @@ A7af0: db 0x17
 A7af1: db 0x03
 A7af2: db 0x74
 A7af3: db 0xd5
-A7af4: db 0xc3
+A7af4: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7af5: db 0xc7
 A7af6: db 0x84
 A7af7: db 0xba
@@ -31294,7 +31262,10 @@ A7b00: db 0xba
 A7b01: db 0x17
 A7b02: db 0x18
 A7b03: db 0x10
-A7b04: db 0xc3
+A7b04: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b05: db 0x83
 A7b06: db 0xbc
 A7b07: db 0xb8
@@ -31309,7 +31280,10 @@ A7b0f: db 0x17
 A7b10: db 0x03
 A7b11: db 0x74
 A7b12: db 0xb6
-A7b13: db 0xc3
+A7b13: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b14: db 0xc7
 A7b15: db 0x84
 A7b16: db 0xba
@@ -31325,7 +31299,10 @@ A7b1f: db 0xba
 A7b20: db 0x17
 A7b21: db 0x18
 A7b22: db 0x18
-A7b23: db 0xc3
+A7b23: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b24: db 0x83
 A7b25: db 0xbc
 A7b26: db 0x32
@@ -31340,7 +31317,10 @@ A7b2e: db 0x18
 A7b2f: db 0x03
 A7b30: db 0x74
 A7b31: db 0x97
-A7b32: db 0xc3
+A7b32: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b33: db 0xc7
 A7b34: db 0x84
 A7b35: db 0xba
@@ -31356,7 +31336,10 @@ A7b3e: db 0xba
 A7b3f: db 0x17
 A7b40: db 0x18
 A7b41: db 0x20
-A7b42: db 0xc3
+A7b42: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b43: db 0x83
 A7b44: db 0xbc
 A7b45: db 0xbc
@@ -31374,7 +31357,10 @@ A7b50: db 0x03
 A7b51: db 0xe9
 A7b52: db 0x75
 A7b53: db 0xff
-A7b54: db 0xc3
+A7b54: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b55: db 0xc7
 A7b56: db 0x84
 A7b57: db 0xba
@@ -31390,7 +31376,10 @@ A7b60: db 0xba
 A7b61: db 0x17
 A7b62: db 0x18
 A7b63: db 0x28
-A7b64: db 0xc3
+A7b64: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b65: db 0xa1
 A7b66: db 0x4d
 A7b67: db 0x16
@@ -31404,7 +31393,10 @@ A7b6e: db 0xf8
 A7b6f: db 0x03
 A7b70: db 0x74
 A7b71: db 0x31
-A7b72: db 0xc3
+A7b72: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7b73: db 0x1e
 A7b74: db 0x56
 A7b75: db 0x8b
@@ -31448,11 +31440,16 @@ A7b9a: db 0x88
 A7b9b: db 0x9c
 A7b9c: db 0xbb
 A7b9d: db 0x17
-A7b9e: db 0xc3
-A7b9f: db 0xe8
-A7ba0: db 0xad
-A7ba1: db 0xad
-A7ba2: db 0xc3
+A7b9e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A7b9f:
+	call A294f
+	ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7ba3: db 0x8a
 A7ba4: db 0x9c
 A7ba5: db 0xbb
@@ -31477,7 +31474,10 @@ A7bb7: db 0xfb
 A7bb8: db 0x0e
 A7bb9: db 0x74
 A7bba: db 0x20
-A7bbb: db 0xc3
+A7bbb: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7bbc: db 0x83
 A7bbd: db 0xbc
 A7bbe: db 0x42
@@ -31492,7 +31492,10 @@ A7bc6: db 0x17
 A7bc7: db 0x03
 A7bc8: db 0x74
 A7bc9: db 0xd5
-A7bca: db 0xc3
+A7bca: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7bcb: db 0xc7
 A7bcc: db 0x84
 A7bcd: db 0xba
@@ -31508,7 +31511,10 @@ A7bd6: db 0xba
 A7bd7: db 0x17
 A7bd8: db 0x18
 A7bd9: db 0x10
-A7bda: db 0xc3
+A7bda: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7bdb: db 0x83
 A7bdc: db 0xbc
 A7bdd: db 0xb8
@@ -31523,7 +31529,10 @@ A7be5: db 0x17
 A7be6: db 0x03
 A7be7: db 0x74
 A7be8: db 0xb6
-A7be9: db 0xc3
+A7be9: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7bea: db 0xc7
 A7beb: db 0x84
 A7bec: db 0xba
@@ -31539,7 +31548,10 @@ A7bf5: db 0xba
 A7bf6: db 0x17
 A7bf7: db 0x18
 A7bf8: db 0x18
-A7bf9: db 0xc3
+A7bf9: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7bfa: db 0x83
 A7bfb: db 0xbc
 A7bfc: db 0x32
@@ -31554,7 +31566,10 @@ A7c04: db 0x18
 A7c05: db 0x03
 A7c06: db 0x74
 A7c07: db 0x97
-A7c08: db 0xc3
+A7c08: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7c09: db 0xc7
 A7c0a: db 0x84
 A7c0b: db 0xba
@@ -31570,7 +31585,10 @@ A7c14: db 0xba
 A7c15: db 0x17
 A7c16: db 0x18
 A7c17: db 0x20
-A7c18: db 0xc3
+A7c18: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7c19: db 0x83
 A7c1a: db 0xbc
 A7c1b: db 0xbc
@@ -31588,7 +31606,10 @@ A7c26: db 0x03
 A7c27: db 0xe9
 A7c28: db 0x75
 A7c29: db 0xff
-A7c2a: db 0xc3
+A7c2a: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7c2b: db 0xc7
 A7c2c: db 0x84
 A7c2d: db 0xba
@@ -31604,8 +31625,11 @@ A7c36: db 0xba
 A7c37: db 0x17
 A7c38: db 0x18
 A7c39: db 0x28
-A7c3a: db 0xc3
-A7c3b: db 0x56
+A7c3a: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A7c3b: push si
 A7c3c: db 0x8b
 A7c3d: db 0xbc
 A7c3e: db 0x43
@@ -31677,7 +31701,10 @@ A7c7f: db 0x88
 A7c80: db 0x9c
 A7c81: db 0xbb
 A7c82: db 0x17
-A7c83: db 0xc3
+A7c83: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7c84: db 0xc7
 A7c85: db 0x84
 A7c86: db 0xba
@@ -31696,7 +31723,10 @@ A7c92: db 0x84
 A7c93: db 0xbb
 A7c94: db 0x17
 A7c95: db 0x01
-A7c96: db 0xc3
+A7c96: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7c97: db 0x80
 A7c98: db 0xbc
 A7c99: db 0xb8
@@ -31709,7 +31739,10 @@ A7c9f: db 0x84
 A7ca0: db 0xbb
 A7ca1: db 0x17
 A7ca2: db 0x01
-A7ca3: db 0xc3
+A7ca3: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7ca4: db 0x83
 A7ca5: db 0xbc
 A7ca6: db 0x42
@@ -31732,7 +31765,10 @@ A7cb6: db 0xba
 A7cb7: db 0x17
 A7cb8: db 0x18
 A7cb9: db 0x10
-A7cba: db 0xc3
+A7cba: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7cbb: db 0x80
 A7cbc: db 0xbc
 A7cbd: db 0x42
@@ -31743,7 +31779,10 @@ A7cc1: db 0x04
 A7cc2: db 0xe8
 A7cc3: db 0x8a
 A7cc4: db 0xac
-A7cc5: db 0xc3
+A7cc5: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7cc6: db 0x83
 A7cc7: db 0xbc
 A7cc8: db 0xbc
@@ -31756,7 +31795,10 @@ A7cce: db 0x84
 A7ccf: db 0xbb
 A7cd0: db 0x17
 A7cd1: db 0x09
-A7cd2: db 0xc3
+A7cd2: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7cd3: db 0x80
 A7cd4: db 0xbc
 A7cd5: db 0xbc
@@ -31769,14 +31811,20 @@ A7cdb: db 0x84
 A7cdc: db 0xbb
 A7cdd: db 0x17
 A7cde: db 0x09
-A7cdf: db 0xc3
+A7cdf: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7ce0: db 0xc6
 A7ce1: db 0x84
 A7ce2: db 0xbb
 A7ce3: db 0x17
 A7ce4: db 0x01
-A7ce5: db 0xc3
-A7ce6: db 0x56
+A7ce5: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A7ce6: push si
 A7ce7: db 0x8b
 A7ce8: db 0xbc
 A7ce9: db 0xcb
@@ -31843,7 +31891,10 @@ A7d25: db 0x88
 A7d26: db 0x9c
 A7d27: db 0xbb
 A7d28: db 0x17
-A7d29: db 0xc3
+A7d29: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7d2a: db 0xc7
 A7d2b: db 0x84
 A7d2c: db 0xba
@@ -31862,7 +31913,10 @@ A7d38: db 0x84
 A7d39: db 0xbb
 A7d3a: db 0x17
 A7d3b: db 0x03
-A7d3c: db 0xc3
+A7d3c: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7d3d: db 0x80
 A7d3e: db 0xbc
 A7d3f: db 0x32
@@ -31875,7 +31929,10 @@ A7d45: db 0x84
 A7d46: db 0xbb
 A7d47: db 0x17
 A7d48: db 0x03
-A7d49: db 0xc3
+A7d49: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7d4a: db 0x83
 A7d4b: db 0xbc
 A7d4c: db 0xb8
@@ -31898,7 +31955,10 @@ A7d5c: db 0xba
 A7d5d: db 0x17
 A7d5e: db 0x18
 A7d5f: db 0x18
-A7d60: db 0xc3
+A7d60: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7d61: db 0x80
 A7d62: db 0xbc
 A7d63: db 0xb8
@@ -31909,7 +31969,10 @@ A7d67: db 0x04
 A7d68: db 0xe8
 A7d69: db 0xe4
 A7d6a: db 0xab
-A7d6b: db 0xc3
+A7d6b: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7d6c: db 0x83
 A7d6d: db 0xbc
 A7d6e: db 0x42
@@ -31922,7 +31985,10 @@ A7d74: db 0x84
 A7d75: db 0xbb
 A7d76: db 0x17
 A7d77: db 0x0f
-A7d78: db 0xc3
+A7d78: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7d79: db 0x80
 A7d7a: db 0xbc
 A7d7b: db 0x42
@@ -31935,14 +32001,20 @@ A7d81: db 0x84
 A7d82: db 0xbb
 A7d83: db 0x17
 A7d84: db 0x0f
-A7d85: db 0xc3
+A7d85: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7d86: db 0xc6
 A7d87: db 0x84
 A7d88: db 0xbb
 A7d89: db 0x17
 A7d8a: db 0x03
-A7d8b: db 0xc3
-A7d8c: db 0x56
+A7d8b: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A7d8c: push si
 A7d8d: db 0x8b
 A7d8e: db 0xbc
 A7d8f: db 0x53
@@ -32016,7 +32088,10 @@ A7dd2: db 0x88
 A7dd3: db 0x9c
 A7dd4: db 0xbb
 A7dd5: db 0x17
-A7dd6: db 0xc3
+A7dd6: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7dd7: db 0xc7
 A7dd8: db 0x84
 A7dd9: db 0xba
@@ -32035,7 +32110,10 @@ A7de5: db 0x84
 A7de6: db 0xbb
 A7de7: db 0x17
 A7de8: db 0x05
-A7de9: db 0xc3
+A7de9: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7dea: db 0x80
 A7deb: db 0xbc
 A7dec: db 0xbc
@@ -32048,7 +32126,10 @@ A7df2: db 0x84
 A7df3: db 0xbb
 A7df4: db 0x17
 A7df5: db 0x05
-A7df6: db 0xc3
+A7df6: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7df7: db 0x83
 A7df8: db 0xbc
 A7df9: db 0x32
@@ -32071,7 +32152,10 @@ A7e09: db 0xba
 A7e0a: db 0x17
 A7e0b: db 0x18
 A7e0c: db 0x20
-A7e0d: db 0xc3
+A7e0d: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7e0e: db 0x80
 A7e0f: db 0xbc
 A7e10: db 0x32
@@ -32082,7 +32166,10 @@ A7e14: db 0x04
 A7e15: db 0xe8
 A7e16: db 0x37
 A7e17: db 0xab
-A7e18: db 0xc3
+A7e18: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7e19: db 0x83
 A7e1a: db 0xbc
 A7e1b: db 0xb8
@@ -32095,7 +32182,10 @@ A7e21: db 0x84
 A7e22: db 0xbb
 A7e23: db 0x17
 A7e24: db 0x0d
-A7e25: db 0xc3
+A7e25: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7e26: db 0x80
 A7e27: db 0xbc
 A7e28: db 0xb8
@@ -32108,14 +32198,20 @@ A7e2e: db 0x84
 A7e2f: db 0xbb
 A7e30: db 0x17
 A7e31: db 0x0d
-A7e32: db 0xc3
+A7e32: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7e33: db 0xc6
 A7e34: db 0x84
 A7e35: db 0xbb
 A7e36: db 0x17
 A7e37: db 0x05
-A7e38: db 0xc3
-A7e39: db 0x56
+A7e38: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A7e39: push si
 A7e3a: db 0x8b
 A7e3b: db 0xbc
 A7e3c: db 0xc9
@@ -32183,7 +32279,10 @@ A7e79: db 0x88
 A7e7a: db 0x9c
 A7e7b: db 0xbb
 A7e7c: db 0x17
-A7e7d: db 0xc3
+A7e7d: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7e7e: db 0xc7
 A7e7f: db 0x84
 A7e80: db 0xba
@@ -32202,7 +32301,10 @@ A7e8c: db 0x84
 A7e8d: db 0xbb
 A7e8e: db 0x17
 A7e8f: db 0x07
-A7e90: db 0xc3
+A7e90: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7e91: db 0x80
 A7e92: db 0xbc
 A7e93: db 0x42
@@ -32215,7 +32317,10 @@ A7e99: db 0x84
 A7e9a: db 0xbb
 A7e9b: db 0x17
 A7e9c: db 0x07
-A7e9d: db 0xc3
+A7e9d: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7e9e: db 0x83
 A7e9f: db 0xbc
 A7ea0: db 0xbc
@@ -32238,7 +32343,10 @@ A7eb0: db 0xba
 A7eb1: db 0x17
 A7eb2: db 0x18
 A7eb3: db 0x28
-A7eb4: db 0xc3
+A7eb4: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7eb5: db 0x80
 A7eb6: db 0xbc
 A7eb7: db 0xbc
@@ -32249,7 +32357,10 @@ A7ebb: db 0x04
 A7ebc: db 0xe8
 A7ebd: db 0x90
 A7ebe: db 0xaa
-A7ebf: db 0xc3
+A7ebf: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7ec0: db 0x83
 A7ec1: db 0xbc
 A7ec2: db 0x32
@@ -32262,7 +32373,10 @@ A7ec8: db 0x84
 A7ec9: db 0xbb
 A7eca: db 0x17
 A7ecb: db 0x0b
-A7ecc: db 0xc3
+A7ecc: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7ecd: db 0x80
 A7ece: db 0xbc
 A7ecf: db 0x32
@@ -32275,13 +32389,19 @@ A7ed5: db 0x84
 A7ed6: db 0xbb
 A7ed7: db 0x17
 A7ed8: db 0x0b
-A7ed9: db 0xc3
+A7ed9: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7eda: db 0xc6
 A7edb: db 0x84
 A7edc: db 0xbb
 A7edd: db 0x17
 A7ede: db 0x07
-A7edf: db 0xc3
+A7edf: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A7ee0: db 0x80
 A7ee1: db 0x3e
 A7ee2: db 0xd3
@@ -32538,8 +32658,11 @@ A7fdc: db 0x00
 A7fdd: db 0xe8
 A7fde: db 0xc2
 A7fdf: db 0x00
-A7fe0: db 0xc3
-A7fe1: db 0x56
+A7fe0: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A7fe1: push si
 A7fe2: db 0x80
 A7fe3: db 0x3e
 A7fe4: db 0x4a
@@ -32608,7 +32731,10 @@ A8022: db 0xe8
 A8023: db 0x89
 A8024: db 0x03
 A8025: db 0x5e
-A8026: db 0xc3
+A8026: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8027: db 0x80
 A8028: db 0x3e
 A8029: db 0x9a
@@ -32616,7 +32742,10 @@ A802a: db 0x37
 A802b: db 0x01
 A802c: db 0x74
 A802d: db 0x01
-A802e: db 0xc3
+A802e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A802f: db 0xa0
 A8030: db 0x6c
 A8031: db 0x16
@@ -32624,7 +32753,10 @@ A8032: db 0x3c
 A8033: db 0x00
 A8034: db 0x75
 A8035: db 0x01
-A8036: db 0xc3
+A8036: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8037: db 0xfe
 A8038: db 0xc8
 A8039: db 0x74
@@ -32632,7 +32764,10 @@ A803a: db 0x04
 A803b: db 0xa2
 A803c: db 0x6c
 A803d: db 0x16
-A803e: db 0xc3
+A803e: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A803f: db 0xa2
 A8040: db 0x6c
 A8041: db 0x16
@@ -32682,7 +32817,10 @@ A806c: db 0x42
 A806d: db 0xb0
 A806e: db 0x00
 A806f: db 0xee
-A8070: db 0xc3
+A8070: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8071: db 0x80
 A8072: db 0x3e
 A8073: db 0x9a
@@ -32690,8 +32828,11 @@ A8074: db 0x37
 A8075: db 0x01
 A8076: db 0x74
 A8077: db 0x01
-A8078: db 0xc3
-A8079: db 0x56
+A8078: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A8079: push si
 A807a: db 0xa0
 A807b: db 0x4c
 A807c: db 0x16
@@ -32731,8 +32872,11 @@ A809d: db 0x06
 A809e: db 0x6c
 A809f: db 0x16
 A80a0: db 0x46
-A80a1: db 0xc3
-A80a2: db 0x55
+A80a1: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A80a2: push bp
 A80a3: db 0x8b
 A80a4: db 0xec
 A80a5: db 0x83
@@ -32896,7 +33040,10 @@ A8142: db 0x02
 A8143: db 0x8b
 A8144: db 0xe5
 A8145: db 0x5d
-A8146: db 0xc3
+A8146: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8147: db 0x88
 A8148: db 0x26
 A8149: db 0x59
@@ -33371,7 +33518,10 @@ A831d: db 0x42
 A831e: db 0xb0
 A831f: db 0xff
 A8320: db 0xee
-A8321: db 0xc3
+A8321: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8322: db 0x06
 A8323: db 0xb8
 A8324: db 0x00
@@ -33495,7 +33645,10 @@ A8399: db 0x04
 A839a: db 0xeb
 A839b: db 0x8c
 A839c: db 0x07
-A839d: db 0xc3
+A839d: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A839e: db 0x80
 A839f: db 0x3e
 A83a0: db 0x9a
@@ -33511,7 +33664,10 @@ A83a9: db 0x03
 A83aa: db 0xe8
 A83ab: db 0x75
 A83ac: db 0xff
-A83ad: db 0xc3
+A83ad: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A83ae: db 0x1e
 A83af: db 0x06
 A83b0: db 0xb8
@@ -33576,7 +33732,10 @@ A83ea: db 0xd6
 A83eb: db 0x9d
 A83ec: db 0x07
 A83ed: db 0x1f
-A83ee: db 0xc3
+A83ee: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A83ef: db 0x1e
 A83f0: db 0x06
 A83f1: db 0xb8
@@ -33661,7 +33820,10 @@ A843f: db 0xc2
 A8440: db 0x9d
 A8441: db 0x07
 A8442: db 0x1f
-A8443: db 0xc3
+A8443: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8444: db 0x06
 A8445: db 0xb8
 A8446: db 0x00
@@ -33700,7 +33862,10 @@ A8466: db 0x75
 A8467: db 0xf0
 A8468: db 0x1f
 A8469: db 0x07
-A846a: db 0xc3
+A846a: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A846b: db 0x80
 A846c: db 0x3e
 A846d: db 0x9a
@@ -33723,11 +33888,9 @@ A847d: db 0x4b
 A847e: db 0xba
 A847f: db 0x60
 A8480: db 0x00
-A8481: db 0xb9
-A8482: db 0x28
-A8483: db 0x00
-A8484: db 0xf3
-A8485: db 0xa4
+A8481:
+	mov cx,20
+	rep movsw
 A8486: db 0x83
 A8487: db 0xc7
 A8488: db 0x02
@@ -33795,11 +33958,9 @@ A84c5: db 0x42
 A84c6: db 0x8a
 A84c7: db 0xc4
 A84c8: db 0xee
-A84c9: db 0xb9
-A84ca: db 0x28
-A84cb: db 0x00
-A84cc: db 0xf3
-A84cd: db 0xa4
+A84c9:
+	mov cx,20
+	rep movsw
 A84ce: db 0x83
 A84cf: db 0xef
 A84d0: db 0x28
@@ -33839,7 +34000,10 @@ A84f1: db 0xee
 A84f2: db 0xe8
 A84f3: db 0xeb
 A84f4: db 0xf9
-A84f5: db 0xc3
+A84f5: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A84f6: db 0x80
 A84f7: db 0x3e
 A84f8: db 0x9a
@@ -33847,7 +34011,10 @@ A84f9: db 0x37
 A84fa: db 0x01
 A84fb: db 0x75
 A84fc: db 0x01
-A84fd: db 0xc3
+A84fd: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A84fe: db 0xbe
 A84ff: db 0x00
 A8500: db 0x00
@@ -33919,11 +34086,9 @@ A8541: db 0x42
 A8542: db 0x8a
 A8543: db 0xc4
 A8544: db 0xee
-A8545: db 0xb9
-A8546: db 0x2a
-A8547: db 0x00
-A8548: db 0xf3
-A8549: db 0xa4
+A8545:
+	mov cx,21
+	rep movsw
 A854a: db 0x83
 A854b: db 0xef
 A854c: db 0x2a
@@ -33971,13 +34136,19 @@ A8575: db 0x42
 A8576: db 0xb0
 A8577: db 0x01
 A8578: db 0xee
-A8579: db 0xc3
+A8579: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A857a: db 0x00
 A857b: db 0x00
 A857c: db 0x00
 A857d: db 0x00
 A857e: db 0x00
 A857f: db 0x00
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8580: db 0xa1
 A8581: db 0x30
 A8582: db 0xde
@@ -33994,7 +34165,10 @@ A858c: db 0x30
 A858d: db 0xde
 A858e: db 0xd1
 A858f: db 0xe8
-A8590: db 0xc3
+A8590: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
 A8591: db 0x00
 A8592: db 0x00
 A8593: db 0x00
@@ -34595,8 +34769,12 @@ A87e5: db 0x00
 A87e6: db 0x00
 A87e7: db 0x00
 A87e8: db 0x00
-A87e9: db 0x06
-A87ea: db 0x1e
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A87e9:
+	push es
+	push ds
 A87eb: db 0xbe
 A87ec: db 0x80
 A87ed: db 0x85
@@ -34638,8 +34816,8 @@ A8810: db 0x00
 A8811: db 0x1f
 A8812: db 0x07
 A8813:
-	mov ax,0x0	; Read system clock counter
-	int 0x1a	; System and Real Time Clock BIOS Services
+	mov ax,0x0 ; Read system clock counter
+	int 0x1a ; System and Real Time Clock BIOS Services
 A8818: db 0x33
 A8819: db 0xca
 A881a: db 0x89
@@ -35078,11 +35256,11 @@ A89ca: db 0x06
 A89cb: db 0x9b
 A89cc: db 0x0d
 A89cd: db 0x01
-A89ce: db 0xc3
-A89cf: db 0xb8
-A89d0: db 0x05
-A89d1: db 0x00
-A89d2: db 0xe9
-A89d3: db 0x08
-A89d4: db 0x77
-A89d5: ret
+A89ce: ret
+
+; ---- ---- ---- ---- ---- ---- ---- ----
+
+A89cf:
+	mov ax,0x5
+	db 0xe9, 0x08, 0x77 ; jmp A00dd
+	ret
