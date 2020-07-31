@@ -1,4 +1,4 @@
-	mov dx,0x3f60				; data segment
+	mov dx,0x3f60				; data segment (relocation #1)
 	mov ds,dx
 	mov ax,0xa000
 	mov es,ax
@@ -318,8 +318,9 @@ setup_keyboard_interrupt:
 	int 0x21
 	mov [0x16ed],es
 	mov [0x16ef],bx
-	mov dx,keyboard_interrupt ; offset address of keyboard interrupt
-	mov ax,0x36c2 ; segment address of code segment
+	mov dx,keyboard_interrupt		; offset address of keyboard interrupt
+times 0x295-($-$$) nop
+	mov ax,0x36c2				; segment address of code segment (relocation #2)
 	mov ds,ax
 	mov ah,0x25
 	mov al,0x9
@@ -361,9 +362,10 @@ keyboard_interrupt:
 	push bx
 	push cx
 	push ds
-	mov ax,0x3f60
+times 0x2bc-($-$$) nop
+	mov ax,0x3f60				; relocation #3
 	mov ds,ax
-	in al,0x60 ; PS/2 keyboard data port
+	in al,0x60				; PS/2 keyboard data port
 	mov cl,al
 	mov bl,al
 	in al,0x61
@@ -405,7 +407,8 @@ PIT_interrupt:
 	push ds
 	push dx
 	push ax
-	mov ax,0x3f60
+times 0x30d-($-$$) nop
+	mov ax,0x3f60				; relocation #4
 	mov ds,ax
 	cmp byte [0xd9e],0x0
 	jz A035f
@@ -465,7 +468,8 @@ setup_PIT_interrupt:
 	mov [0xd8c],es
 	mov [0xd8e],bx
 	mov dx,PIT_interrupt
-	mov ax,0x36c2
+times 0x3a8-($-$$) nop
+	mov ax,0x36c2				; relocation #5
 	mov ds,ax
 	mov ah,0x25				; set interrupt vector
 	mov al,0x8
@@ -516,6 +520,7 @@ times 0x03e3-($-$$) nop
 
 	; install error handler
 A03e3:
+	; relocation #6 would be somewhere around here
 	ret
 
 times 0x0404-($-$$) nop
@@ -636,174 +641,82 @@ times 0x04dc-($-$$) nop
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A04dc: db 0xb8
-A04dd: db 0x00
-A04de: db 0x3c
-A04df: db 0xb9
-A04e0: db 0x00
-A04e1: db 0x00
-A04e2: db 0xba
-A04e3: db 0xa3
-A04e4: db 0x36
-A04e5: db 0xcd
-A04e6: db 0x21
-A04e7: db 0x73
-A04e8: db 0x03
-A04e9: db 0xe9
-A04ea: db 0xf1
-A04eb: db 0xfb
-A04ec: db 0xa3
-A04ed: db 0x66
-A04ee: db 0x07
-A04ef: db 0xbe
-A04f0: db 0x68
-A04f1: db 0x07
-A04f2: db 0x80
-A04f3: db 0x3e
-A04f4: db 0x76
-A04f5: db 0xce
-A04f6: db 0x02
-A04f7: db 0x75
-A04f8: db 0x05
-A04f9: db 0xc6
-A04fa: db 0x04
-A04fb: db 0x73
-A04fc: db 0xeb
-A04fd: db 0x33
-A04fe: db 0x80
-A04ff: db 0x3e
-A0500: db 0x76
-A0501: db 0xce
-A0502: db 0x01
-A0503: db 0x75
-A0504: db 0x05
-A0505: db 0xc6
-A0506: db 0x04
-A0507: db 0x69
-A0508: db 0xeb
-A0509: db 0x27
-A050a: db 0x80
-A050b: db 0x3e
-A050c: db 0x76
-A050d: db 0xce
-A050e: db 0x03
-A050f: db 0x75
-A0510: db 0x05
-A0511: db 0xc6
-A0512: db 0x04
-A0513: db 0x61
-A0514: db 0xeb
-A0515: db 0x1b
-A0516: db 0x80
-A0517: db 0x3e
-A0518: db 0x76
-A0519: db 0xce
-A051a: db 0x05
-A051b: db 0x75
-A051c: db 0x05
-A051d: db 0xc6
-A051e: db 0x04
-A051f: db 0x72
-A0520: db 0xeb
-A0521: db 0x0f
-A0522: db 0x80
-A0523: db 0x3e
-A0524: db 0x75
-A0525: db 0xce
-A0526: db 0x05
-A0527: db 0x75
-A0528: db 0x05
-A0529: db 0xc6
-A052a: db 0x04
-A052b: db 0x63
-A052c: db 0xeb
-A052d: db 0x03
-A052e: db 0xc6
-A052f: db 0x04
-A0530: db 0x62
-A0531: db 0x46
-A0532: db 0x80
-A0533: db 0x3e
-A0534: db 0x30
-A0535: db 0x06
-A0536: db 0x00
-A0537: db 0x75
-A0538: db 0x05
-A0539: db 0xc6
-A053a: db 0x04
-A053b: db 0x6b
-A053c: db 0xeb
-A053d: db 0x03
-A053e: db 0xc6
-A053f: db 0x04
-A0540: db 0x6a
-A0541: db 0x46
-A0542: db 0x80
-A0543: db 0x3e
-A0544: db 0x74
-A0545: db 0xce
-A0546: db 0x00
-A0547: db 0x74
-A0548: db 0x05
-A0549: db 0xc6
-A054a: db 0x04
-A054b: db 0x6d
-A054c: db 0xeb
-A054d: db 0x03
-A054e: db 0xc6
-A054f: db 0x04
-A0550: db 0x6e
-A0551: db 0x46
-A0552: db 0x80
-A0553: db 0x3e
-A0554: db 0x73
-A0555: db 0xce
-A0556: db 0x00
-A0557: db 0x74
-A0558: db 0x05
-A0559: db 0xc6
-A055a: db 0x04
-A055b: db 0x78
-A055c: db 0xeb
-A055d: db 0x03
-A055e: db 0xc6
-A055f: db 0x04
-A0560: db 0x79
-A0561: db 0x8b
-A0562: db 0x1e
-A0563: db 0x66
-A0564: db 0x07
-A0565: db 0xb8
-A0566: db 0x00
-A0567: db 0x40
-A0568: db 0xb9
-A0569: db 0x04
-A056a: db 0x00
-A056b: db 0xba
-A056c: db 0x68
-A056d: db 0x07
-A056e: db 0xcd
-A056f: db 0x21
-A0570: db 0x73
-A0571: db 0x03
-A0572: db 0xe9
-A0573: db 0x68
-A0574: db 0xfb
-A0575: db 0xb8
-A0576: db 0x00
-A0577: db 0x3e
-A0578: db 0x8b
-A0579: db 0x1e
-A057a: db 0x66
-A057b: db 0x07
-A057c: db 0xcd
-A057d: db 0x21
-A057e: db 0x73
-A057f: db 0x03
-A0580: db 0xe9
-A0581: db 0x5a
-A0582: db 0xfb
-A0583: ret
+A04dc:
+	mov ax,0x3c00
+	mov cx,0x0
+	mov dx,0x36a3
+	int 0x21
+	jnc A04ec
+	jmp A00dd
+A04ec:
+	mov [0x766],ax
+	mov si,0x768
+	cmp byte [0xce76],0x2
+	jnz A04fe
+	mov byte [si],0x73
+	jmp short 0x531
+A04fe:
+	cmp byte [0xce76],0x1
+	jnz A050a
+	mov byte [si],0x69
+	jmp short A0531
+A050a:
+	cmp byte [0xce76],0x3
+	jnz A0516
+	mov byte [si],0x61
+	jmp short A0531
+A0516:
+	cmp byte [0xce76],0x5
+	jnz A0522
+	mov byte [si],0x72
+	jmp short A0531
+A0522:
+	cmp byte [0xce75],0x5
+	jnz A052e
+	mov byte [si],0x63
+	jmp short A0531
+A052e:
+	mov byte [si],0x62
+A0531:
+	inc si
+	cmp byte [0x630],0x0
+	jnz A053e
+	mov byte [si],0x6b
+	jmp short A0541
+A053e:
+	mov byte [si],0x6a
+A0541:
+	inc si
+	cmp byte [0xce74],0x0
+	jz A054e
+	mov byte [si],0x6d
+	jmp short A0551
+A054e:
+	mov byte [si],0x6e
+A0551:
+	inc si
+	cmp byte [0xce73],0x0
+	jz A055e
+	mov byte [si],0x78
+	jmp short A0561
+A055e:
+	mov byte [si],0x79
+A0561:
+	mov bx,[0x766]
+	mov ax,0x4000
+	mov cx,0x4
+	mov dx,0x768
+	int 0x21
+	jnc A0575
+	jmp A00dd
+A0575:
+	mov ax,0x3e00
+	mov bx,[0x766]
+	int 0x21
+	jnc A0583
+	jmp A00dd
+A0583:
+	ret
 
 times 0x0584-($-$$) nop
 
@@ -817,9 +730,8 @@ times 0x058b-($-$$) nop
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
 A058b: db 0x06
-A058c: db 0xb8
-A058d: db 0x20
-A058e: db 0x27
+A058c:
+	mov ax,0x2720				; relocation #7
 A058f: db 0x8e
 A0590: db 0xc0
 A0591: db 0xbb
@@ -938,65 +850,34 @@ times 0x05fa-($-$$) nop
 
 ; ---- ---- ---- ---- ---- ---- ---- ----
 
-A05fa: db 0xb8
-A05fb: db 0x00
-A05fc: db 0x3d
+A05fa:
+	mov ax,0x3d00
 	mov dx,0x3776 ; PALETTES.DAT
-A0600: db 0xcd
-A0601: db 0x21
-A0602: db 0x73
-A0603: db 0x0d
-A0604: db 0x83
-A0605: db 0xf8
-A0606: db 0x02
-A0607: db 0x75
-A0608: db 0x05
-A0609: db 0xe8
-A060a: db 0x97
-A060b: db 0x06
-A060c: db 0xeb
-A060d: db 0x03
-A060e: db 0xe9
-A060f: db 0xcc
-A0610: db 0xfa
-A0611: db 0xa3
-A0612: db 0x66
-A0613: db 0x07
-A0614: db 0x8b
-A0615: db 0x1e
-A0616: db 0x66
-A0617: db 0x07
-A0618: db 0xb8
-A0619: db 0x00
-A061a: db 0x3f
-A061b: db 0xb9
-A061c: db 0x00
-A061d: db 0x01
-A061e: db 0xba
-A061f: db 0x5b
-A0620: db 0x5f
-A0621: db 0xcd
-A0622: db 0x21
-A0623: db 0x73
-A0624: db 0x03
-A0625: db 0xe9
-A0626: db 0xb5
-A0627: db 0xfa
-A0628: db 0xb8
-A0629: db 0x00
-A062a: db 0x3e
-A062b: db 0x8b
-A062c: db 0x1e
-A062d: db 0x66
-A062e: db 0x07
-A062f: db 0xcd
-A0630: db 0x21
-A0631: db 0x73
-A0632: db 0x03
-A0633: db 0xe9
-A0634: db 0xa7
-A0635: db 0xfa
-A0636: ret
+	int 0x21
+	jnc A0611
+	cmp ax,byte +0x2
+	jnz A060e
+	call A0ca3
+	jmp short A0611
+A060e:
+	jmp A00dd
+A0611:
+	mov [0x766],ax
+	mov bx,[0x766]
+	mov ax,0x3f00
+	mov cx,0x100
+	mov dx,0x5f5b
+	int 0x21
+	jnc A0628
+	jmp A00dd
+A0628:
+	mov ax,0x3e00
+	mov bx,[0x766]
+	int 0x21
+	jnc A0636
+	jmp A00dd
+A0636:
+	ret
 
 times 0x0637-($-$$) nop
 
@@ -1894,9 +1775,8 @@ A09b5: db 0xa3
 A09b6: db 0x66
 A09b7: db 0x07
 A09b8: db 0x1e
-A09b9: db 0xb8
-A09ba: db 0x50
-A09bb: db 0x1f
+A09b9:
+	mov ax,0x1f50				; relocation #8
 A09bc: db 0x8b
 A09bd: db 0x1e
 A09be: db 0x66
@@ -2333,9 +2213,8 @@ A0b63: db 0x1e
 A0b64: db 0x66
 A0b65: db 0x07
 A0b66: db 0x1e
-A0b67: db 0xb8
-A0b68: db 0xb0
-A0b69: db 0x0f
+A0b67:
+	mov ax,0xfb0				; relocation #9
 A0b6a: db 0x8e
 A0b6b: db 0xd8
 A0b6c: db 0xb8
@@ -2407,9 +2286,8 @@ A0baa: db 0x1e
 A0bab: db 0x66
 A0bac: db 0x07
 A0bad: db 0x1e
-A0bae: db 0xb8
-A0baf: db 0x80
-A0bb0: db 0x17
+A0bae:
+	mov ax,0x1780					; relocation #10
 A0bb1: db 0x8e
 A0bb2: db 0xd8
 A0bb3: db 0xb8
@@ -5575,9 +5453,8 @@ A174f: db 0x00
 A1750: db 0x06
 A1751: db 0x8b
 A1752: db 0xd8
-A1753: db 0xb8
-A1754: db 0x46
-A1755: db 0x4d
+A1753:
+	mov ax,0x4d46
 A1756: db 0x8e
 A1757: db 0xc0
 A1758: db 0xbf
@@ -7161,9 +7038,8 @@ A1d83: db 0xd2
 A1d84: db 0x0d
 A1d85: db 0xc3
 A1d86: db 0x06
-A1d87: db 0xb8
-A1d88: db 0x20
-A1d89: db 0x27
+A1d87:
+	mov ax,0x2720					; relocation #12
 A1d8a: db 0x8e
 A1d8b: db 0xc0
 A1d8c: db 0x8b
@@ -21165,15 +21041,15 @@ times 0x54fe-($-$$) nop
 
 	; vsync for menu etc.
 A54fe:
-;	push dx
-;	push ax
-;A5500:
-;	mov dx,0x3da
-;	in al,dx
-;	test al,0x8
-;	jnz A5500
-;	pop ax
-;	pop dx
+	push dx
+	push ax
+A5500:
+	mov dx,0x3da
+	in al,dx
+	test al,0x8
+	jnz A5500
+	pop ax
+	pop dx
 	ret
 
 times 0x550b-($-$$) nop
