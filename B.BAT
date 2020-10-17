@@ -1,0 +1,8 @@
+cycles max
+nasm -O0 -fbin adlib.asm -o adlib.snd
+nasm -O0 -fbin blaster.asm -o blaster.snd
+nasm -O0 -fbin roland.asm -o roland.snd
+nasm -O0 -fbin code.asm -o code.bin
+nasm -O0 -fbin supaplex.asm -o supaplex.com
+rem del code.bin
+cycles 10000
