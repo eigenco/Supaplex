@@ -113,14 +113,25 @@ wt:
 
 ; ---- EGA style palette assignment ----
 
-        mov     cx, 16
-        mov     dx, 0x3c0
-pal:        
-        mov     al, cl
-        out     dx, al
-        dec     al
-        out     dx, al
-        loop    pal
+        mov     cx, 0x0010
+palloop:
+        push    cx
+        mov     ax, 0x1000
+        mov     bl, cl
+        dec     bl
+        mov     bh, bl
+        int     0x10
+        pop     cx
+        loop    palloop
+
+;        mov     cx, 16
+;        mov     dx, 0x3c0
+;pal:        
+;        mov     al, cl
+;        out     dx, al
+;        dec     al
+;        out     dx, al
+;        loop    pal
 
 ; ---- 976 pixels wide ----
 
