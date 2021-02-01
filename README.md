@@ -14,3 +14,10 @@ Removed:
 - EGA routines
 - Joystick routines
 - Error handlers
+
+Default:
+- Comment from supaplex.asm, "jmp pass" to enable Roland and Sound Blaster
+- Command from adlib.asm, "in al, dx" lines according to your hardware configuration
+
+Jerking bug:
+The jerking bug is caused by music routine interrupt taking too long for reliable vertial sync. OPL2 requires 6 in al, dx and 35 in al, dx delay to work. These delays are too much so smooth scrolling will only work with OPL3 and fast enough CPU, ao486 or dosbox. OPL3 requires continuous resyncing of the programmable interval timer. Same is true for MIDI. This resync routine has now been built in to the main code (but won't help with OPL2 or OPLxLPT, because of slow port operations).
