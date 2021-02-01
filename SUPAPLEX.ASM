@@ -47,7 +47,7 @@ pass:
 	mov     ax, cs
 	mov     ds, ax
 	mov     si, start
-	add     ax, (512+224288)/16
+	add     ax, 224288/16
 	mov     es, ax
 	mov     di, 0
 	mov     cx, 17643
@@ -64,7 +64,7 @@ pass:
 	mov     bx, ax                 ; file handle in ax after open
 
 	mov     ax, cs
-	add     ax, 512/16+0x3f60
+	add     ax, 0x3f60
 	mov     ds, ax
 	mov     ax, 0x3f00             ; read file
 	mov     cx, 56920              ; number of bytes to read
@@ -77,11 +77,10 @@ pass:
 ; ---- perform relocations ----
 
 	mov     bx, cs
-	add     bx, (512+224288)/16
+	add     bx, 224288/16
 	mov     ds, bx
 
 	mov     ax, cs
-	add     ax, 512/16
 	add     [ds:0x0001], ax ; relocation  #1
 	add     [ds:0x0296], ax ; relocation  #2
 	add     [ds:0x02bd], ax ; relocation  #3
@@ -116,7 +115,18 @@ pass:
 	mov     ax, 0x000d
 	int     0x10
 
-; ---- palette assignment ----
+; ---- EGA style palette assignment ----
+
+;        mov     cx, 0x0010
+;palloop:
+;        push    cx
+;        mov     ax, 0x1000
+;        mov     bl, cl
+;        dec     bl
+;        mov     bh, bl
+;        int     0x10
+;        pop     cx
+;        loop    palloop
 
 	mov     cx, 16
 	mov     dx, 0x3c0
@@ -139,7 +149,6 @@ pal:
 ; ---- prepare stack ----
 
 	mov     ax, cs
-	add     ax, 512/16
 	add     ax, 0x587b
 	mov     ss, ax
 	mov     sp, 0x0400
@@ -147,7 +156,7 @@ pal:
 ; ---- execute the code ----
 
 	mov     ax, cs
-	add     ax, (512+224288)/16
+	add     ax, 224288/16
 	push    ax
 	mov     ax, 0
 	push    ax
