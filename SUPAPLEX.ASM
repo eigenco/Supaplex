@@ -1,8 +1,8 @@
-	org     100h
+	org     0x0100
 
 ; ---- adlib only ----
 
-	jmp pass
+	jmp     pass
 
 ; ---- initialize roland ----
 
@@ -47,7 +47,7 @@ pass:
 	mov     ax, cs
 	mov     ds, ax
 	mov     si, start
-	add     ax, 224288/16
+	add     ax, 14050              ; (512+224288)/16
 	mov     es, ax
 	mov     di, 0
 	mov     cx, 17643
@@ -64,7 +64,7 @@ pass:
 	mov     bx, ax                 ; file handle in ax after open
 
 	mov     ax, cs
-	add     ax, 0x3f60
+	add     ax, 16256              ; 512/16+0x3f60
 	mov     ds, ax
 	mov     ax, 0x3f00             ; read file
 	mov     cx, 56920              ; number of bytes to read
@@ -77,38 +77,40 @@ pass:
 ; ---- perform relocations ----
 
 	mov     bx, cs
-	add     bx, 224288/16
+	add     bx, 14050              ; (512+224288)/16
 	mov     ds, bx
 
 	mov     ax, cs
-	add     [ds:0x0001], ax ; relocation  #1
-	add     [ds:0x0296], ax ; relocation  #2
-	add     [ds:0x02bd], ax ; relocation  #3
-	add     [ds:0x030e], ax ; relocation  #4
-	add     [ds:0x03a9], ax ; relocation  #5
-	add     [ds:0x058d], ax ; relocation  #7
-	add     [ds:0x09ba], ax ; relocation  #8
-	add     [ds:0x0b68], ax ; relocation  #9
-	add     [ds:0x0baf], ax ; relocation #10
-	add     [ds:0x1754], ax ; relocation #11
-	add     [ds:0x1d88], ax ; relocation #12
-	add     [ds:0x2e16], ax ; relocation #13
-	add     [ds:0x33da], ax ; relocation #14
-	add     [ds:0x3440], ax ; relocation #15
-	add     [ds:0x46ac], ax ; relocation #16
-	add     [ds:0x471b], ax ; relocation #17
-	add     [ds:0x478a], ax ; relocation #18
-	add     [ds:0x47ef], ax ; relocation #19
-	add     [ds:0x582b], ax ; relocation #20
-	add     [ds:0x5838], ax ; relocation #21
-	add     [ds:0x59ca], ax ; relocation #22
-	add     [ds:0x59ff], ax ; relocation #23
-	add     [ds:0x8324], ax ; relocation #24
-	add     [ds:0x83b1], ax ; relocation #25
-	add     [ds:0x83f2], ax ; relocation #26
-	add     [ds:0x8446], ax ; relocation #27
-	add     [ds:0x8474], ax ; relocation #28
-	add     [ds:0x8510], ax ; relocation #29
+;        add     ax, 512/16
+	add     ax, 32
+	add     [0x0001], ax           ; relocations
+	add     [0x0296], ax
+	add     [0x02bd], ax
+	add     [0x030e], ax
+	add     [0x03a9], ax
+	add     [0x058d], ax
+	add     [0x09ba], ax
+	add     [0x0b68], ax
+	add     [0x0baf], ax
+	add     [0x1754], ax
+	add     [0x1d88], ax
+	add     [0x2e16], ax
+	add     [0x33da], ax
+	add     [0x3440], ax
+	add     [0x46ac], ax
+	add     [0x471b], ax
+	add     [0x478a], ax
+	add     [0x47ef], ax
+	add     [0x582b], ax
+	add     [0x5838], ax
+	add     [0x59ca], ax
+	add     [0x59ff], ax
+	add     [0x8324], ax
+	add     [0x83b1], ax
+	add     [0x83f2], ax
+	add     [0x8446], ax
+	add     [0x8474], ax
+	add     [0x8510], ax
 
 ; ---- initialize video ---
 
@@ -149,6 +151,8 @@ pal:
 ; ---- prepare stack ----
 
 	mov     ax, cs
+;        add     ax, 512/16
+	add     ax, 32
 	add     ax, 0x587b
 	mov     ss, ax
 	mov     sp, 0x0400
@@ -156,7 +160,7 @@ pal:
 ; ---- execute the code ----
 
 	mov     ax, cs
-	add     ax, 224288/16
+	add     ax, 14050 ; (512+224288)/16
 	push    ax
 	mov     ax, 0
 	push    ax
@@ -166,4 +170,4 @@ data:
 	db      "data.bin", 0
 
 start:
-	incbin  "code.bin"
+	incbin "code.bin"

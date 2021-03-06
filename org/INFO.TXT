@@ -1,0 +1,23 @@
+Supaplex code in uncompressed supaplex.exe begins at $36CB0
+Supaplex data in uncompressed supaplex.exe begins at $3F690
+
+Uncompress: unp SUPAPLEX.EXE
+
+Extract:
+
+dd if=supaplex.exe of=code.bin skip=224432 bs=1 count=35296
+dd if=supaplex.exe of=data.bin skip=259728 bs=1 count=56920
+
+Compressed:
+$ md5sum SUPAPLEX.EXE
+97fb7c5624cce69eb676fec2d6f12a31 *SUPAPLEX.EXE
+
+Uncompressed:
+$ md5sum SUPAPLEX.EXE
+90f19dd8d11aef57e7205375c0bd6425 *SUPAPLEX.EXE
+
+$ md5sum code.bin
+795dd62c78c8b8862e01a40fe2462269 *code.bin
+
+$ md5sum data.bin
+9739c0db24b86a853e639f0384695ae7 *data.bin

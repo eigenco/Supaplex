@@ -60,7 +60,7 @@ start:
 	out     dx, al
 
 	mov     bx, cs
-	shl     bx, 4
+	db      0xc1, 0xe3, 0x04       ; shl bx, 4
 	add     bx, cx                 ; offset
 
 	mov     dx, 0x02               ; DMA: channel 1 address
@@ -71,9 +71,9 @@ start:
 
 	mov     ax, cs
 	mov     bx, cx
-	shr     bx, 4
+	db      0xc1, 0xeb, 0x04       ; shr bx, 4
 	add     bx, ax
-	shr     bx, 12                 ; DMA: page in bx
+	db      0xc1, 0xeb, 0x0c       ; shr bx, 12 ; DMA: page in bx
 
 	mov     dx, 0x83               ; DMA: channel 1 page
 	mov     al, bl
@@ -101,7 +101,8 @@ wait1:
 	in      al, dx
 	or      al, al
 	js      wait1
-	mov     al, 256 - 1000000/8333
+;        mov     al, 256 - 1000000/8333
+	mov     al, 136
 	out     dx, al
 wait2:
 	in      al, dx

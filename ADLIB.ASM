@@ -1,3 +1,5 @@
+; modifications on line 1096
+
 db 0xfb
 db 0x53
 db 0x51
@@ -1093,18 +1095,18 @@ db 0xc3
 
 	out     dx, al
 
-;    times 2 in al, dx ; OPL3 only (not needed in dosbox or ao486)
-	times 6 in al, dx ; OPL2 only (not needed for OPL3)
+	times 2 in al, dx ; OPL3 (not needed in dosbox or ao486)
+;        times 6 in al, dx ; OPL3
 
 	inc     dx
 	mov     al, ah
 	out     dx, al
 
-;    times 3 in al, dx ; OPL3 (not needed in dosbox or ao486)
-	times 35 in al, dx ; OPL2 only (not needed for OPL3)
+	times 3 in al, dx ; OPL3 (not needed in dosbox or ao486)
+;        times 35 in al, dx ; OPL2
 
 	dec     dx
-	retn
+	ret
 
 times 0x0474-($-$$) nop
 

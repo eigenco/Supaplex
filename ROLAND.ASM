@@ -1,3 +1,5 @@
+; modifications on line 156, 396, 403 and 410
+
 db 0xfb
 db 0x53
 db 0x51
@@ -131,7 +133,7 @@ db 0x0e
 db 0x2d
 db 0x00
 db 0xc3
-retn
+ret ;db 0xba
 db 0x31
 db 0x03
 db 0x33
@@ -151,10 +153,10 @@ db 0x4a
 db 0xec
 db 0xc3
 
-        mov     dx, 0x330
-        mov     al, ah
-        out     dx, al
-        retn
+        mov     dx, 0x330  ;db 0xba db 0x31 db 0x03
+        mov     al, ah     ;db 0x33 db 0xc9
+        out     dx, al     ;db 0xec
+        ret                ;db 0x24
 
 db 0x40
 db 0x74
@@ -391,23 +393,23 @@ db 0xb0
 db 0x02
 db 0xe3
 
-        nop ; remove volume which causes clipping
-        nop
-        nop
+        nop ;db 0xe8 (remove volume which causes clipping)
+        nop ;db 0x0c
+        nop ;db 0xff
 
 db 0xb4
 db 0x07
 
-        nop ; remove volume which causes clipping
-        nop
-        nop
+        nop ;db 0xe8 (remove volume which causes clipping)
+        nop ;db 0x07
+        nop ;db 0xff
 
 db 0xb4
 db 0x7f
 
-        nop ; remove volume which causes clipping
-        nop
-        nop
+        nop ;db 0xe8 (remove volume which causes clipping)
+        nop ;db 0x02
+        nop ;db 0xff
 
 db 0xfe
 db 0xcb
