@@ -13,4 +13,4 @@ Improvements:
 
 Jerking bug:
 
-The jerking bug was caused by music routine interrupt taking too long for reliable vertial sync. OPL2 requires 6 in al, dx and 35 in al, dx delay to work. These delays are too much so smooth scrolling will only work with OPL3 and fast enough CPU, ao486 (MiSTer FPGA), Next186 (MIST FPGA) or dosbox. OPL3 requires continuous resyncing of the programmable interval timer on a real PC.
+The jerking bug was caused by music routine interrupt taking too long for reliable vertial sync. OPL2 requires 6 in al, dx and 35 in al, dx delay to work. These delays are too much so smooth scrolling will only work with OPL3 and fast enough CPU, ao486 (MiSTer FPGA), Next186 (MiST FPGA) or dosbox. OPL3 requires continuous resyncing of the programmable interval timer on a real PC.
