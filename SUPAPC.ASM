@@ -80,7 +80,7 @@ relocate:
 	retf
 
 code:
-	db      "code.bin", 0
+	db      "code.new", 0
 data:
 	db      "data.new", 0
 reloc:
