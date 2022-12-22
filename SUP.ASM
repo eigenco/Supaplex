@@ -1,7 +1,7 @@
 incbin "supaplex.exe",$,0x36cfe-$ ; disable copy protection
    times 3 nop
 
-incbin "supaplex.exe",$,0x39098-$ ; PIT_
+incbin "supaplex.exe",$,0x39098-$ ; PIT
    nop
 
 incbin "supaplex.exe",$,0x3c059-$ ; disable mouse (related bug)
@@ -17,7 +17,7 @@ incbin "supaplex.exe",$,0x3c189-$ ; 70 Hz issue
    mov dx,0x3da
    xor bx, bx
 j1:
-   cmp bx, 10000 ; 386DX40 = 1000, PII266 = 10000
+   cmp bx, 1000 ; 386DX40 = 1000, PII266 = 10000
    ja j2
    sti
    inc bx
@@ -42,6 +42,10 @@ incbin "supaplex.exe",$,0x3c21c-$ ; fix MiST/Next186 resolution issue
 
 incbin "supaplex.exe",$,0x42d40-$
    db "MOVING.NEW"
+incbin "supaplex.exe",$,0x42dda-$
+   db "ADLIB.NEW"                 ; alternative OPL3 driver
 incbin "supaplex.exe",$,0x42de4-$
    db "ROLAND.NEW"
+incbin "supaplex.exe",$,0x42def-$
+   db "BLASTER.NEW"               ; alternative PCM driver
 incbin "supaplex.exe",$

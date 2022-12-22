@@ -1,3 +1,123 @@
+; %define GUS        
+
+%macro outb 2
+	mov     dx, %1
+	mov     al, %2
+	out     dx, al
+%endmacro
+
+%macro outw 2        
+	mov     dx, %1
+	mov     ax, %2
+	out     dx, ax
+%endmacro
+
+%ifdef GUS
+
+explo   equ     0x01b6
+infot   equ     0x2c9f
+pushr   equ     0x3c12
+zonk    equ     0x4370
+bug     equ     0x4bba
+base    equ     0x535c
+exit    equ     0x545c
+end     equ     0x8ea0
+
+	push    ax
+	push    bx
+	push    cx
+	push    dx
+	
+	cmp     ax, 0
+	jne     skip0
+	mov     bx, 0
+	mov     cx, infot - explo
+	jmp     short start
+skip0:
+	cmp     ax, 1
+	jne     skip1
+	mov     bx, infot - explo
+	mov     cx, pushr - explo
+	jmp     short start
+skip1:
+	cmp     ax, 2
+	jne     skip2
+	mov     bx, pushr - explo
+	mov     cx, zonk - explo
+	jmp     short start
+skip2:
+	cmp     ax, 3
+	jne     skip3
+	mov     bx, zonk - explo
+	mov     cx, bug - explo
+	jmp     short start
+skip3:
+	cmp     ax, 4
+	jne     skip4
+	mov     bx, bug - explo
+	mov     cx, base - explo
+	jmp     short start
+skip4:
+	cmp     ax, 5
+	jne     skip5
+	mov     bx, base - explo
+	mov     cx, exit - explo
+	jmp     short start
+skip5:
+	cmp     ax, 6
+	jne     skip6
+	mov     bx, exit - explo
+	mov     cx, end - explo
+	jmp     short start
+skip6:
+	jmp     skip
+start:
+	outb    0x240+0x102, 0
+	outb    0x240+0x102, 0
+	outb    0x240+0x103, 0x0a
+	mov     ax, bx
+	shr     ax, 7
+	and     ax, 0x1fff
+	outw    0x240+0x104, ax
+	outb    0x240+0x103, 0x0b
+	mov     ax, bx
+	and     ax, 0x127
+	shl     ax, 8
+	outw    0x240+0x104, ax
+	outb    0x240+0x103, 0x02
+	mov     ax, bx
+	shr     ax, 7
+	and     ax, 0x1fff
+	outw    0x240+0x104, ax
+	outb    0x240+0x103, 0x03
+	mov     ax, bx
+	and     ax, 0x127
+	shl     ax, 8
+	outw    0x240+0x104, ax
+	outb    0x240+0x103, 0x04
+	mov     ax, cx
+	shr     ax, 7
+	and     ax, 0x1fff
+	outw    0x240+0x104, ax
+	outb    0x240+0x103, 0x05
+	mov     ax, cx
+	and     ax, 0x127
+	shl     ax, 8
+	outw    0x240+0x104, ax
+	outb    0x240+0x103, 0
+	outb    0x240+0x105, 0
+	outb    0x240, 1
+	outb    0x240+0x103, 0x4c
+	outb    0x240+0x105, 3
+skip:
+	pop     dx
+	pop     cx
+	pop     bx
+	pop     ax
+	iret
+%endif
+
+%ifndef GUS
 	push    ax
 	push    bx
 	push    cx
@@ -2383,5 +2503,6 @@ exit:
 	db 0x7f, 0x84, 0x81, 0x80, 0x7f, 0x80, 0x7f, 0x80, 0x7f, 0x7f, 0x81, 0x7f, 0x7f, 0x7e, 0x80, 0x80
 	db 0x80, 0x7f, 0x80, 0x7f
 end:
+%endif
 
 times 39195-($-$$) db 0
